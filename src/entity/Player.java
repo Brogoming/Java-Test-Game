@@ -49,8 +49,8 @@ public class Player extends Entity {
         // set player hit box
         int hitBoxX = gamePanel.tileSize / 6; // 1/6 from the left of entity = 8 pixels
         int hitBoxY = gamePanel.tileSize / 3; // 1/3 from the top of entity = 16 pixels
-        int hitBoxWidth = gamePanel.tileSize * 3 / 4; // 3/4 of the players width = 32 pixels
-        int hitBoxHeight = gamePanel.tileSize * 2 / 3; // 3/4 of the players height = 32 pixels
+        int hitBoxWidth = gamePanel.tileSize * 2 / 3; // 2/3 of the players width = 32 pixels
+        int hitBoxHeight = gamePanel.tileSize * 2 / 3; // 2/3 of the players height = 32 pixels
 
         solidArea = new Rectangle(hitBoxX, hitBoxY, hitBoxWidth, hitBoxHeight);
 
