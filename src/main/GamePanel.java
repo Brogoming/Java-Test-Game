@@ -28,23 +28,26 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenHeight = tileSize * maxScreenRow; // The total screen height in pixels, derived from tile size and row count (576 pixels).
 
     // -------------------------------------------------------------------------
+    // World Settings
+    // -------------------------------------------------------------------------
+    public final int maxWorldCol = 50;
+    public final int maxWorldRow = 50;
+    public final int worldWidth = tileSize * maxWorldCol;
+    public final int worldHeight = tileSize * maxWorldRow;
+
+    // -------------------------------------------------------------------------
     // Game Loop Settings
     // -------------------------------------------------------------------------
-
     int FPS = 60; // The target number of frames to render and update per second.
 
     // -------------------------------------------------------------------------
     // Core Components
     // -------------------------------------------------------------------------
-
     TileManager tileManager = new TileManager(this);
     KeyHandler keyH = new KeyHandler(); //Handles keyboard input and tracks which keys are currently pressed.
     Thread gameThread; // The thread that runs the game loop. When started, it automatically invokes the {@link #run()} method, which drives updates and rendering at the target {@link #FPS}.
-    Player player = new Player(this, keyH); // The player entity, initialized with a reference to this panel and the key handler.
-
-    // -------------------------------------------------------------------------
-    // Constructor
-    // -------------------------------------------------------------------------
+    public CollisionChecker cChecker = new CollisionChecker(this);
+    public Player player = new Player(this, keyH); // The player entity, initialized with a reference to this panel and the key handler.
 
     /**
      * Constructs and configures the {@code GamePanel}.

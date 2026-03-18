@@ -4,40 +4,79 @@ import main.GamePanel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
 
+/**
+ * Manages loading, storing, and rendering all tiles that make up the game world map.
+ */
 public class TileManager {
 
-    GamePanel gamePanel;
-    Tile[] tile;
-    int[][] mapTileNum;
+    GamePanel gamePanel; // Reference to the main game panel for screen and world dimensions
+    public Tile[] tile;         // Array holding each unique tile type and its image
+    public int[][] mapTileNum;  // 2D array representing the world map, storing a tile index per cell
 
+    /**
+     * Constructs the TileManager, initializes the tile and map arrays, then loads tile
+     * images and the world map file.
+     *
+     * @param gamePanel the {@link GamePanel} used to access world and screen dimensions
+     */
     public TileManager(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
-        tile = new Tile[10]; // 10 kinds of tiles
-        mapTileNum = new int[gamePanel.maxScreenCol][gamePanel.maxScreenRow]; //16 x 12
+        tile = new Tile[10];  // Supports up to 10 unique tile types
+        mapTileNum = new int[gamePanel.maxWorldCol][gamePanel.maxWorldRow]; // 50x50 world grid
         getTileImage();
-        loadMap("/maps/map01.txt");
+        loadMap("/maps/world01.txt");
     }
 
+    /**
+     * Loads each tile type's image from the /tiles/ resource folder and assigns it to the tile array.
+     * If any image fails to load, the stack trace is printed.
+     * TODO: Find a better way to load tiles rather than manually setting each one.
+     */
     public void getTileImage() {
         try {
+            // Grass
             tile[0] = new Tile();
             tile[0].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/grass.png")));
+
+            // Wall
             tile[1] = new Tile();
             tile[1].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/wall.png")));
+            tile[1].collision = true;
+
+            // Water
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/water.png")));
+            tile[2].collision = true;
+
+            // Earth
+            tile[3] = new Tile();
+            tile[3].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/earth.png")));
+
+            // Tree
+            tile[4] = new Tile();
+            tile[4].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/tree.png")));
+            tile[4].collision = true;
+
+            // Sand
+            tile[5] = new Tile();
+            tile[5].image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/tiles/sand.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Reads a map text file and populates {@code mapTileNum} with tile indices for each world cell.
+     * Each line in the file represents a row, with space-separated tile index numbers per column.
+     *
+     * @param mapPath the classpath resource path to the map text file (e.g. "/maps/world01.txt")
+     */
     public void loadMap(String mapPath) {
         try {
             InputStream is = getClass().getResourceAsStream(mapPath);
@@ -47,15 +86,16 @@ public class TileManager {
             int col = 0;
             int row = 0;
 
-            while (col < gamePanel.maxScreenCol && row < gamePanel.maxScreenRow) {
-                String line = br.readLine(); //reads line of text
+            while (col < gamePanel.maxWorldCol && row < gamePanel.maxWorldRow) {
+                String line = br.readLine(); // Read one row of tile indices from the map file
                 String[] numbers = line.split(" ");
-                while (col < gamePanel.maxScreenCol) {
+
+                while (col < gamePanel.maxWorldCol) {
                     int num = Integer.parseInt(numbers[col]);
-                    mapTileNum[col][row] = num;
+                    mapTileNum[col][row] = num; // Store the tile index at this world cell
                     col++;
                 }
-                if(col == gamePanel.maxScreenCol) {
+                if (col == gamePanel.maxWorldCol) { // Move to the next row once all columns in the current row are filled
                     col = 0;
                     row++;
                 }
@@ -66,25 +106,40 @@ public class TileManager {
         }
     }
 
+    /**
+     * Draws only the tiles visible within the player's screen bounds, offsetting each tile's
+     * position relative to the player to simulate camera movement through the world.
+     *
+     * @param g2 the {@link Graphics2D} context used for rendering
+     */
     public void draw(Graphics2D g2) {
-        int col = 0;
-        int row = 0;
-        int x = 0;
-        int y = 0;
-        while (col < gamePanel.maxScreenCol && row < gamePanel.maxScreenRow) {
+        int worldCol = 0;
+        int worldRow = 0;
 
-            int tileNum = mapTileNum[col][row];
+        while (worldCol < gamePanel.maxWorldCol && worldRow < gamePanel.maxWorldRow) {
+            int tileNum = mapTileNum[worldCol][worldRow];
 
-            g2.drawImage(tile[tileNum].image, x, y, gamePanel.tileSize, gamePanel.tileSize, null);
-            col++;
-            x += gamePanel.tileSize;
-            if (col == gamePanel.maxScreenCol) {
-                col = 0;
-                x = 0;
-                row++;
-                y += gamePanel.tileSize;
+            int worldX = worldCol * gamePanel.tileSize; // Tile's X position in world pixels
+            int worldY = worldRow * gamePanel.tileSize; // Tile's Y position in world pixels
+
+            // Translate world position to screen position relative to the player
+            int screenX = worldX - gamePanel.player.worldX + gamePanel.player.screenX;
+            int screenY = worldY - gamePanel.player.worldY + gamePanel.player.screenY;
+
+            // Only draw tiles within the visible screen boundary, plus a 1-tile buffer for smooth scrolling
+            if (worldX + gamePanel.tileSize > gamePanel.player.worldX - gamePanel.player.screenX
+                    && worldX - gamePanel.tileSize < gamePanel.player.worldX + gamePanel.player.screenX
+                    && worldY + gamePanel.tileSize > gamePanel.player.worldY - gamePanel.player.screenY
+                    && worldY - gamePanel.tileSize < gamePanel.player.worldY + gamePanel.player.screenY) {
+                g2.drawImage(tile[tileNum].image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+            }
+
+            // Advance to the next tile, wrapping to the next row after the last column
+            worldCol++;
+            if (worldCol == gamePanel.maxWorldCol) {
+                worldCol = 0;
+                worldRow++;
             }
         }
-
     }
 }
