@@ -32,5 +32,7 @@ public class Entity {
     // Hit Box
     // -------------------------------------------------------------------------
     public Rectangle solidArea; // Describes the area of the hit box
+    public int solidAreaDefaultX;
+    public int solidAreaDefaultY;
     public boolean collisionOn = false;
 }

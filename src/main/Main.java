@@ -29,6 +29,7 @@ public class Main {
         window.setLocationRelativeTo(null); // Center the window on the screen (null means relative to the screen itself)
         window.setVisible(true); // Make the window visible to the user
 
+        gamePanel.setupGame();
         gamePanel.startGameThread(); // Start the game loop on a separate thread to handle updates and rendering
     }
 }

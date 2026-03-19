@@ -1,6 +1,7 @@
 package main;
 
 import entity.Player;
+import object.SuperObject;
 import tile.TileManager;
 
 import javax.swing.*;
@@ -47,7 +48,9 @@ public class GamePanel extends JPanel implements Runnable {
     KeyHandler keyH = new KeyHandler(); //Handles keyboard input and tracks which keys are currently pressed.
     Thread gameThread; // The thread that runs the game loop. When started, it automatically invokes the {@link #run()} method, which drives updates and rendering at the target {@link #FPS}.
     public CollisionChecker cChecker = new CollisionChecker(this);
+    public AssetSetter assetSetter = new AssetSetter(this);
     public Player player = new Player(this, keyH); // The player entity, initialized with a reference to this panel and the key handler.
+    public SuperObject[] objs = new SuperObject[10]; // Prepares up to 10 object slots to be DISPLAYED during the game
 
     /**
      * Constructs and configures the {@code GamePanel}.
@@ -67,6 +70,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         this.addKeyListener(keyH); // Register the key handler to listen for keyboard events on this panel
         this.setFocusable(true); // Allow this panel to receive focus so it can capture keyboard input
+    }
+
+    public void setupGame() {
+        assetSetter.setObject();
     }
 
     // -------------------------------------------------------------------------
@@ -134,7 +141,7 @@ public class GamePanel extends JPanel implements Runnable {
     /**
      * Updates the game state for the current frame.
      * <p>
-     * Delegates to each game entity's own update logic. Currently updates
+     * Delegates to each game entity's own update logic. Currently, updates
      * only the {@link Player}, but should be extended as more entities are added.
      * </p>
      */
@@ -157,8 +164,11 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g); // Call the parent implementation to clear the panel before redrawing
         Graphics2D g2 = (Graphics2D) g; // Cast to Graphics2D for enhanced rendering control (transformations, shapes, etc.)
 
-        //Layer the tiles to the play is above the tiles
-        tileManager.draw(g2);
+
+        tileManager.draw(g2); //Layer the tiles to the play is above the tiles
+        for (SuperObject obj : objs) { // Place objects from the object array
+            if (obj != null) obj.draw(g2, this);
+        }
         player.draw(g2); // Draw the player onto the panel
 
         g2.dispose(); // Release the Graphics2D resources to free up memory

@@ -27,13 +27,12 @@ public class Player extends Entity {
     public final int screenX; // The fixed X screen coordinate where the player is always drawn, horizontally centered.
     public final int screenY; // The fixed Y screen coordinate where the player is always drawn, vertically centered.
 
-    // -------------------------------------------------------------------------
-    // Constructor
-    // -------------------------------------------------------------------------
+    int hasKey = 0; // How many keys a player has
 
     /**
      * Constructs a Player, calculates its fixed center screen position,
      * and loads default values and sprite images.
+     *
      * @param gamePanel  the {@link GamePanel} this player belongs to
      * @param keyHandler the {@link KeyHandler} used to read keyboard input
      */
@@ -47,12 +46,13 @@ public class Player extends Entity {
         screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
 
         // set player hit box
-        int hitBoxX = gamePanel.tileSize / 6; // 1/6 from the left of entity = 8 pixels
-        int hitBoxY = gamePanel.tileSize / 3; // 1/3 from the top of entity = 16 pixels
-        int hitBoxWidth = gamePanel.tileSize * 2 / 3; // 2/3 of the players width = 32 pixels
-        int hitBoxHeight = gamePanel.tileSize * 2 / 3; // 2/3 of the players height = 32 pixels
-
-        solidArea = new Rectangle(hitBoxX, hitBoxY, hitBoxWidth, hitBoxHeight);
+        solidArea = new Rectangle(); // hitBoxX, hitBoxY, hitBoxWidth, hitBoxHeight
+        solidArea.x = gamePanel.tileSize / 6; // 1/6 from the left of entity = 8 pixels
+        solidArea.y = gamePanel.tileSize / 3; // 1/3 from the top of entity = 16 pixels
+        solidAreaDefaultX = solidArea.x;
+        solidAreaDefaultY = solidArea.y;
+        solidArea.width = gamePanel.tileSize * 2 / 3; // 2/3 of the players width = 32 pixels
+        solidArea.height = gamePanel.tileSize * 2 / 3; // 2/3 of the players height = 32 pixels
 
         setDefaultValues();
         getPlayerImage();
@@ -117,9 +117,11 @@ public class Player extends Entity {
             else if (keyH.rightPressed) direction = "right";
             // if you want diagonal movement don't use else if or just add it here
 
-            // CHECK TILE COLLISION
+            // CHECK COLLISIONS
             collisionOn = false;
-            gamePanel.cChecker.checkCollision(this);
+            gamePanel.cChecker.checkTileCollision(this);
+            int objIndex = gamePanel.cChecker.checkObjectCollision(this, true);
+            pickUpObject(objIndex);
 
             //IF COLLISION IS FALSE, PLAYER CAN MOVE
             if (!collisionOn) {
@@ -144,6 +146,29 @@ public class Player extends Entity {
                 if (spriteNum == 1) spriteNum = 2;
                 else if (spriteNum == 2) spriteNum = 1;
                 spriteCounter = 0; // Reset counter after toggling
+            }
+        }
+    }
+
+    /**
+     * "Picks up" the object depending on what the object is
+     *
+     * @param index the index of the object the player is touching
+     */
+    public void pickUpObject(int index) {
+        if (index != 999) {
+            String objectName = gamePanel.objs[index].name;
+            switch (objectName) {
+                case "Key":
+                    hasKey++;
+                    gamePanel.objs[index] = null; // removes the object we touched
+                    break;
+                case "Door":
+                    if(hasKey > 0){
+                        gamePanel.objs[index] = null; // removes the door
+                        hasKey--; // Player has 1 less key
+                    }
+                    break;
             }
         }
     }
