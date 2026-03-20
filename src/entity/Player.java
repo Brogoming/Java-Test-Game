@@ -32,6 +32,11 @@ public class Player extends Entity {
 	// -------------------------------------------------------------------------
 	public int hasKey = 0; // How many keys a player has
 
+	// -------------------------------------------------------------------------
+	// Extra animation variables
+	// -------------------------------------------------------------------------
+	int standCounter = 0;
+
 	/**
 	 * Constructs a Player, calculates its fixed center screen position,
 	 * and loads default values and sprite images.
@@ -115,9 +120,9 @@ public class Player extends Entity {
 
 			//TODO fix user input so character movement is smoother
 			if ( keyH.upPressed ) direction = "up";
-			else if ( keyH.downPressed ) direction = "down";
-			else if ( keyH.leftPressed ) direction = "left";
-			else if ( keyH.rightPressed ) direction = "right";
+			if ( keyH.downPressed ) direction = "down";
+			if ( keyH.leftPressed ) direction = "left";
+			if ( keyH.rightPressed ) direction = "right";
 			// if you want diagonal movement don't use else if or just add it here
 
 			// CHECK COLLISIONS
@@ -143,12 +148,38 @@ public class Player extends Entity {
 						break;
 				}
 			}
+			
+			/*
+			 // Diagonal movement
+			 if ( keyH.upPressed ) {
+			 direction = "up";
+			 if ( !collisionOn ) worldY -= speed;
+			 }
+			 if ( keyH.downPressed ) {
+			 direction = "down";
+			 if ( !collisionOn ) worldY += speed;
+			 }
+			 if ( keyH.leftPressed ) {
+			 direction = "left";
+			 if ( !collisionOn ) worldX -= speed;
+			 }
+			 if ( keyH.rightPressed ) {
+			 direction = "right";
+			 if ( !collisionOn ) worldX += speed;
+			 }
+			 */
 
 			spriteCounter++; // Advance the animation frame counter each update tick
 			if ( spriteCounter > 12 ) { // Toggle between sprite frames 1 and 2 every 12 frames to create a walk cycle
 				if ( spriteNum == 1 ) spriteNum = 2;
 				else if ( spriteNum == 2 ) spriteNum = 1;
 				spriteCounter = 0; // Reset counter after toggling
+			}
+		} else {
+			standCounter++;
+			if ( standCounter == 20 ) { // Waits a 3rd of a second before going to standing mode
+				spriteNum = 1;
+				standCounter = 0;
 			}
 		}
 	}
@@ -225,5 +256,10 @@ public class Player extends Entity {
 
 		// Draw the selected sprite at the player's fixed screen position, scaled to tile size
 		g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+
+		// Draw collision area for troubleshooting
+		// TODO disable before release lol
+		g2.setColor(Color.RED);
+		g2.drawRect(screenX + solidArea.x, screenY + solidArea.y, solidArea.width, solidArea.height);
 	}
 }
