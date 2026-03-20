@@ -1,20 +1,26 @@
 package object;
 
+import main.GamePanel;
+
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.Objects;
 
-public class OBJ_Boots extends SuperObject{
-    /**
-     * Constructs a Boots object, loading its sprite.
-     */
-    public OBJ_Boots() {
-        name = "Boots";
+public class OBJ_Boots extends SuperObject {
 
-        try {
-            image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/objects/boots.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	GamePanel gamePanel;
+
+	/**
+	 * Constructs a Boots object, loading its sprite.
+	 */
+	public OBJ_Boots( GamePanel gamePanel ) {
+		name = "Boots";
+
+		try {
+			image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/objects/boots.png")));
+			util.scaleImage(image, gamePanel.tileSize, gamePanel.tileSize);
+		} catch ( IOException e ) {
+			e.printStackTrace();
+		}
+	}
 }

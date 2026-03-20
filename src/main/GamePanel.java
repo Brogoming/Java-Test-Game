@@ -170,12 +170,29 @@ public class GamePanel extends JPanel implements Runnable {
 		super.paintComponent(g); // Call the parent implementation to clear the panel before redrawing
 		Graphics2D g2 = (Graphics2D) g; // Cast to Graphics2D for enhanced rendering control (transformations, shapes, etc.)
 
+		// Debug
+		long drawStart = 0;
+		if ( keyH.debugMode ) {
+			drawStart = System.nanoTime();
+		}
+
+		// Game Essentials
 		tileManager.draw(g2); //Layer the tiles to the play is above the tiles
 		for ( SuperObject obj : objs ) { // Place objects from the object array
 			if ( obj != null ) obj.draw(g2, this);
 		}
 		player.draw(g2); // Draw the player onto the panel
 		ui.draw(g2); // Draw this last so it's not behind other assets
+
+		// Debug
+		if ( keyH.debugMode ) {
+			long drawEnd = System.nanoTime();
+			long drawTime = drawEnd - drawStart;
+			g2.setColor(Color.white);
+			g2.drawString("Draw time: " + drawTime, 10, 400);
+			System.out.println("Draw time: " + drawTime);
+		}
+
 		g2.dispose(); // Release the Graphics2D resources to free up memory
 	}
 

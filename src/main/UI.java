@@ -33,7 +33,7 @@ public class UI {
 		arial80B = new Font("Arial", Font.BOLD, 80);  // Bold font for end screen
 
 		// TODO: Load the key image directly from its resource path instead of instantiating a full OBJ_Key
-		OBJ_Key key = new OBJ_Key();
+		OBJ_Key key = new OBJ_Key(gamePanel);
 		keyImage = key.image;
 	}
 
