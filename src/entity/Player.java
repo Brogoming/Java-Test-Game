@@ -15,195 +15,215 @@ import java.util.Objects;
  */
 public class Player extends Entity {
 
-    // -------------------------------------------------------------------------
-    // Core References
-    // -------------------------------------------------------------------------
-    GamePanel gamePanel; // Reference to the main game panel, used to access screen and tile dimensions.
-    KeyHandler keyH; // Reference to the key handler, used to read directional input each frame.
+	// -------------------------------------------------------------------------
+	// Core References
+	// -------------------------------------------------------------------------
+	GamePanel gamePanel; // Reference to the main game panel, used to access screen and tile dimensions.
+	KeyHandler keyH; // Reference to the key handler, used to read directional input each frame.
 
-    // -------------------------------------------------------------------------
-    // Screen Position
-    // -------------------------------------------------------------------------
-    public final int screenX; // The fixed X screen coordinate where the player is always drawn, horizontally centered.
-    public final int screenY; // The fixed Y screen coordinate where the player is always drawn, vertically centered.
+	// -------------------------------------------------------------------------
+	// Screen Position
+	// -------------------------------------------------------------------------
+	public final int screenX; // The fixed X screen coordinate where the player is always drawn, horizontally centered.
+	public final int screenY; // The fixed Y screen coordinate where the player is always drawn, vertically centered.
 
-    int hasKey = 0; // How many keys a player has
+	// -------------------------------------------------------------------------
+	// Inventory
+	// -------------------------------------------------------------------------
+	public int hasKey = 0; // How many keys a player has
 
-    /**
-     * Constructs a Player, calculates its fixed center screen position,
-     * and loads default values and sprite images.
-     *
-     * @param gamePanel  the {@link GamePanel} this player belongs to
-     * @param keyHandler the {@link KeyHandler} used to read keyboard input
-     */
-    public Player(GamePanel gamePanel, KeyHandler keyHandler) {
-        this.gamePanel = gamePanel;
-        this.keyH = keyHandler;
+	/**
+	 * Constructs a Player, calculates its fixed center screen position,
+	 * and loads default values and sprite images.
+	 *
+	 * @param gamePanel  the {@link GamePanel} this player belongs to
+	 * @param keyHandler the {@link KeyHandler} used to read keyboard input
+	 */
+	public Player( GamePanel gamePanel, KeyHandler keyHandler ) {
+		this.gamePanel = gamePanel;
+		this.keyH = keyHandler;
 
-        // Center the player on screen, offsetting by half a tile since
-        // draw coordinates refer to the top-left corner of the sprite
-        screenX = gamePanel.screenWidth / 2 - (gamePanel.tileSize / 2);
-        screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
+		// Center the player on screen, offsetting by half a tile since
+		// draw coordinates refer to the top-left corner of the sprite
+		screenX = gamePanel.screenWidth / 2 - (gamePanel.tileSize / 2);
+		screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
 
-        // set player hit box
-        solidArea = new Rectangle(); // hitBoxX, hitBoxY, hitBoxWidth, hitBoxHeight
-        solidArea.x = gamePanel.tileSize / 6; // 1/6 from the left of entity = 8 pixels
-        solidArea.y = gamePanel.tileSize / 3; // 1/3 from the top of entity = 16 pixels
-        solidAreaDefaultX = solidArea.x;
-        solidAreaDefaultY = solidArea.y;
-        solidArea.width = gamePanel.tileSize * 2 / 3; // 2/3 of the players width = 32 pixels
-        solidArea.height = gamePanel.tileSize * 2 / 3; // 2/3 of the players height = 32 pixels
+		// set player hit box
+		solidArea = new Rectangle(); // hitBoxX, hitBoxY, hitBoxWidth, hitBoxHeight
+		solidArea.x = gamePanel.tileSize / 6; // 1/6 from the left of entity = 8 pixels
+		solidArea.y = gamePanel.tileSize / 3; // 1/3 from the top of entity = 16 pixels
+		solidAreaDefaultX = solidArea.x;
+		solidAreaDefaultY = solidArea.y;
+		solidArea.width = gamePanel.tileSize * 2 / 3; // 2/3 of the players width = 32 pixels
+		solidArea.height = gamePanel.tileSize * 2 / 3; // 2/3 of the players height = 32 pixels
 
-        setDefaultValues();
-        getPlayerImage();
-    }
+		setDefaultValues();
+		getPlayerImage();
+	}
 
-    // -------------------------------------------------------------------------
-    // Initialization
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Initialization
+	// -------------------------------------------------------------------------
 
-    /**
-     * Sets the player's starting world position (tile 23, 21), movement speed, and default direction.
-     */
-    public void setDefaultValues() {
-        // Place the player at tile (23, 21) in the game world
-        worldX = gamePanel.tileSize * 23;
-        worldY = gamePanel.tileSize * 21;
+	/**
+	 * Sets the player's starting world position (tile 23, 21), movement speed, and default direction.
+	 */
+	public void setDefaultValues() {
+		// Place the player at tile (23, 21) in the game world
+		worldX = gamePanel.tileSize * 23;
+		worldY = gamePanel.tileSize * 21;
 
-        // Movement speed in pixels per frame
-        speed = 4;
+		// Movement speed in pixels per frame
+		speed = 4;
 
-        // Default facing direction on game start
-        direction = "down";
-    }
+		// Default facing direction on game start
+		direction = "down";
+	}
 
-    /**
-     * Loads all directional walk-cycle sprite frames from the /player/ resource folder.
-     * If loading fails, the stack trace is printed.
-     * <p>
-     * TODO: Streamline the process to make it easier to swap out the player sprite sheet.
-     */
-    public void getPlayerImage() {
-        try {
-            up1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_up_1.png")));
-            up2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_up_2.png")));
-            down1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_down_1.png")));
-            down2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_down_2.png")));
-            left1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_left_1.png")));
-            left2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_left_2.png")));
-            right1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_right_1.png")));
-            right2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_right_2.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	/**
+	 * Loads all directional walk-cycle sprite frames from the /player/ resource folder.
+	 * If loading fails, the stack trace is printed.
+	 * <p>
+	 * TODO: Streamline the process to make it easier to swap out the player sprite sheet.
+	 */
+	public void getPlayerImage() {
+		try {
+			up1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_up_1.png")));
+			up2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_up_2.png")));
+			down1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_down_1.png")));
+			down2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_down_2.png")));
+			left1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_left_1.png")));
+			left2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_left_2.png")));
+			right1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_right_1.png")));
+			right2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/boy_right_2.png")));
+		} catch ( IOException e ) {
+			e.printStackTrace();
+		}
+	}
 
-    // -------------------------------------------------------------------------
-    // Game Loop Methods
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Game Loop Methods
+	// -------------------------------------------------------------------------
 
-    /**
-     * Reads keyboard input to move the player in the world and advances the walk-cycle animation.
-     * Sprite animation only ticks while a movement key is held.
-     */
-    public void update() {
-        // Only process movement and animation if at least one direction key is held
-        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+	/**
+	 * Reads keyboard input to move the player in the world and advances the walk-cycle animation.
+	 * Sprite animation only ticks while a movement key is held.
+	 */
+	public void update() {
+		// Only process movement and animation if at least one direction key is held
+		if ( keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed ) {
 
-            //TODO fix user input so character movement is smoother
-            if (keyH.upPressed) direction = "up";
-            else if (keyH.downPressed) direction = "down";
-            else if (keyH.leftPressed) direction = "left";
-            else if (keyH.rightPressed) direction = "right";
-            // if you want diagonal movement don't use else if or just add it here
+			//TODO fix user input so character movement is smoother
+			if ( keyH.upPressed ) direction = "up";
+			else if ( keyH.downPressed ) direction = "down";
+			else if ( keyH.leftPressed ) direction = "left";
+			else if ( keyH.rightPressed ) direction = "right";
+			// if you want diagonal movement don't use else if or just add it here
 
-            // CHECK COLLISIONS
-            collisionOn = false;
-            gamePanel.cChecker.checkTileCollision(this);
-            int objIndex = gamePanel.cChecker.checkObjectCollision(this, true);
-            pickUpObject(objIndex);
+			// CHECK COLLISIONS
+			collisionOn = false;
+			gamePanel.cChecker.checkTileCollision(this);
+			int objIndex = gamePanel.cChecker.checkObjectCollision(this, true);
+			objectInteraction(objIndex);
 
-            //IF COLLISION IS FALSE, PLAYER CAN MOVE
-            if (!collisionOn) {
-                switch (direction) {
-                    case "up":
-                        worldY -= speed; // Move player up in the world (decrease Y)
-                        break;
-                    case "down":
-                        worldY += speed; // Move player down in the world (increase Y)
-                        break;
-                    case "left":
-                        worldX -= speed; // Move player left in the world (decrease X)
-                        break;
-                    case "right":
-                        worldX += speed; // Move player right in the world (increase X)
-                        break;
-                }
-            }
+			//IF COLLISION IS FALSE, PLAYER CAN MOVE
+			if ( !collisionOn ) {
+				switch ( direction ) {
+					case "up":
+						worldY -= speed; // Move player up in the world (decrease Y)
+						break;
+					case "down":
+						worldY += speed; // Move player down in the world (increase Y)
+						break;
+					case "left":
+						worldX -= speed; // Move player left in the world (decrease X)
+						break;
+					case "right":
+						worldX += speed; // Move player right in the world (increase X)
+						break;
+				}
+			}
 
-            spriteCounter++; // Advance the animation frame counter each update tick
-            if (spriteCounter > 12) { // Toggle between sprite frames 1 and 2 every 12 frames to create a walk cycle
-                if (spriteNum == 1) spriteNum = 2;
-                else if (spriteNum == 2) spriteNum = 1;
-                spriteCounter = 0; // Reset counter after toggling
-            }
-        }
-    }
+			spriteCounter++; // Advance the animation frame counter each update tick
+			if ( spriteCounter > 12 ) { // Toggle between sprite frames 1 and 2 every 12 frames to create a walk cycle
+				if ( spriteNum == 1 ) spriteNum = 2;
+				else if ( spriteNum == 2 ) spriteNum = 1;
+				spriteCounter = 0; // Reset counter after toggling
+			}
+		}
+	}
 
-    /**
-     * "Picks up" the object depending on what the object is
-     *
-     * @param index the index of the object the player is touching
-     */
-    public void pickUpObject(int index) {
-        if (index != 999) {
-            String objectName = gamePanel.objs[index].name;
-            switch (objectName) {
-                case "Key":
-                    hasKey++;
-                    gamePanel.objs[index] = null; // removes the object we touched
-                    break;
-                case "Door":
-                    if(hasKey > 0){
-                        gamePanel.objs[index] = null; // removes the door
-                        hasKey--; // Player has 1 less key
-                    }
-                    break;
-            }
-        }
-    }
+	/**
+	 * Interacts with the object depending on what the object is
+	 *
+	 * @param index the index of the object the player is touching
+	 */
+	public void objectInteraction( int index ) {
+		if ( index != 999 ) {
+			String objectName = gamePanel.objs[index].name;
+			switch ( objectName ) {
+				case "Key": // Adds the key to our inventory and removes it from the map
+					gamePanel.playSoundEffect(1); // Index = 1 is coin sound
+					hasKey++;
+					gamePanel.objs[index] = null; // removes the object we touched
+					gamePanel.ui.showMessage("You got a key!");
+					break;
+				case "Door": // Removes the door if the user has a key
+					if ( hasKey > 0 ) {
+						gamePanel.playSoundEffect(3); // Index = 3 is unlock
+						gamePanel.objs[index] = null; // removes the door
+						hasKey--; // Player has 1 less key
+						gamePanel.ui.showMessage("Door unlocked!");
+					} else {
+						gamePanel.ui.showMessage("Door is locked!");
+					}
+					break;
+				case "Boots": // Makes the player faster
+					gamePanel.playSoundEffect(2); // Index = 2 is power-up
+					speed += 1;
+					gamePanel.objs[index] = null;
+					gamePanel.ui.showMessage("Speed up!");
+					break;
+				case "Chest": // When you get the chest you beat the game so we want to stop it
+					gamePanel.ui.gameFinished = true;
+					gamePanel.stopMusic();
+					gamePanel.playSoundEffect(4); //fanfare
+					break;
+			}
+		}
+	}
 
-    /**
-     * Selects the correct sprite frame based on direction and animation state,
-     * then draws it at the player's fixed center screen position scaled to tile size.
-     *
-     * @param g2 the {@link Graphics2D} context used for rendering
-     */
-    public void draw(Graphics2D g2) {
-        // Holds the sprite frame to draw this tick; determined by direction and animation frame
-        BufferedImage image = null;
+	/**
+	 * Selects the correct sprite frame based on direction and animation state,
+	 * then draws it at the player's fixed center screen position scaled to tile size.
+	 *
+	 * @param g2 the {@link Graphics2D} context used for rendering
+	 */
+	public void draw( Graphics2D g2 ) {
+		// Holds the sprite frame to draw this tick; determined by direction and animation frame
+		BufferedImage image = null;
 
-        // Select the correct sprite frame based on current direction and walk-cycle frame
-        switch (direction) {
-            case "up":
-                if (spriteNum == 1) image = up1;
-                if (spriteNum == 2) image = up2;
-                break;
-            case "down":
-                if (spriteNum == 1) image = down1;
-                if (spriteNum == 2) image = down2;
-                break;
-            case "left":
-                if (spriteNum == 1) image = left1;
-                if (spriteNum == 2) image = left2;
-                break;
-            case "right":
-                if (spriteNum == 1) image = right1;
-                if (spriteNum == 2) image = right2;
-                break;
-        }
+		// Select the correct sprite frame based on current direction and walk-cycle frame
+		switch ( direction ) {
+			case "up":
+				if ( spriteNum == 1 ) image = up1;
+				if ( spriteNum == 2 ) image = up2;
+				break;
+			case "down":
+				if ( spriteNum == 1 ) image = down1;
+				if ( spriteNum == 2 ) image = down2;
+				break;
+			case "left":
+				if ( spriteNum == 1 ) image = left1;
+				if ( spriteNum == 2 ) image = left2;
+				break;
+			case "right":
+				if ( spriteNum == 1 ) image = right1;
+				if ( spriteNum == 2 ) image = right2;
+				break;
+		}
 
-        // Draw the selected sprite at the player's fixed screen position, scaled to tile size
-        g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
-    }
+		// Draw the selected sprite at the player's fixed screen position, scaled to tile size
+		g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
+	}
 }
