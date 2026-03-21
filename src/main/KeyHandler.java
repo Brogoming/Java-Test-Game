@@ -14,10 +14,16 @@ import java.awt.event.KeyListener;
  */
 public class KeyHandler implements KeyListener {
 
+
 	// -------------------------------------------------------------------------
 	// Input State Flags
 	// -------------------------------------------------------------------------
 	public boolean upPressed, downPressed, leftPressed, rightPressed, debugMode = false;
+	GamePanel gamePanel;
+
+	public KeyHandler( GamePanel gamePanel ) {
+		this.gamePanel = gamePanel;
+	}
 
 	// -------------------------------------------------------------------------
 	// KeyListener Implementation
@@ -40,14 +46,25 @@ public class KeyHandler implements KeyListener {
 	public void keyPressed( KeyEvent e ) {
 		int code = e.getKeyCode(); //returns the keyCode associated with the key in this event, based on ascii characters
 
+		// Movement
 		if ( code == KeyEvent.VK_W ) upPressed = true;
 		if ( code == KeyEvent.VK_S ) downPressed = true;
 		if ( code == KeyEvent.VK_A ) leftPressed = true;
 		if ( code == KeyEvent.VK_D ) rightPressed = true;
 
 		// Debug
-		if ( code == KeyEvent.VK_T )
-			debugMode = !debugMode;
+		if ( code == KeyEvent.VK_T ) debugMode = !debugMode;
+
+		// Pause
+		if ( code == KeyEvent.VK_ESCAPE ) {
+			if ( gamePanel.gameState == gamePanel.playState ) {
+				gamePanel.gameState = gamePanel.pauseState;
+				gamePanel.stopMusic();
+			} else if ( gamePanel.gameState == gamePanel.pauseState ) {
+				gamePanel.gameState = gamePanel.playState;
+				gamePanel.playMusic();
+			}
+		}
 	}
 
 	/**

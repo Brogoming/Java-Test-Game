@@ -31,7 +31,6 @@ public class Player extends Entity {
 	// -------------------------------------------------------------------------
 	// Inventory
 	// -------------------------------------------------------------------------
-	public int hasKey = 0; // How many keys a player has
 
 	// -------------------------------------------------------------------------
 	// Extra animation variables
@@ -200,36 +199,7 @@ public class Player extends Entity {
 	 */
 	public void objectInteraction( int index ) {
 		if ( index != 999 ) {
-			String objectName = gamePanel.objs[index].name;
-			switch ( objectName ) {
-				case "Key": // Adds the key to our inventory and removes it from the map
-					gamePanel.playSoundEffect(1); // Index = 1 is coin sound
-					hasKey++;
-					gamePanel.objs[index] = null; // removes the object we touched
-					gamePanel.ui.showMessage("You got a key!");
-					break;
-				case "Door": // Removes the door if the user has a key
-					if ( hasKey > 0 ) {
-						gamePanel.playSoundEffect(3); // Index = 3 is unlock
-						gamePanel.objs[index] = null; // removes the door
-						hasKey--; // Player has 1 less key
-						gamePanel.ui.showMessage("Door unlocked!");
-					} else {
-						gamePanel.ui.showMessage("Door is locked!");
-					}
-					break;
-				case "Boots": // Makes the player faster
-					gamePanel.playSoundEffect(2); // Index = 2 is power-up
-					speed += 1;
-					gamePanel.objs[index] = null;
-					gamePanel.ui.showMessage("Speed up!");
-					break;
-				case "Chest": // When you get the chest you beat the game so we want to stop it
-					gamePanel.ui.gameFinished = true;
-					gamePanel.stopMusic();
-					gamePanel.playSoundEffect(4); //fanfare
-					break;
-			}
+			// TODO temp for now
 		}
 	}
 

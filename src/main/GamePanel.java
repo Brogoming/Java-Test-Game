@@ -43,7 +43,7 @@ public class GamePanel extends JPanel implements Runnable {
 	// Core System Components
 	// -------------------------------------------------------------------------
 	TileManager tileManager = new TileManager(this);
-	KeyHandler keyH = new KeyHandler(); //Handles keyboard input and tracks which keys are currently pressed.
+	KeyHandler keyH = new KeyHandler(this); //Handles keyboard input and tracks which keys are currently pressed.
 	Sound soundEffect = new Sound(); // Specifically for object effects
 	Sound music = new Sound(); // Specifically for sound effects
 	public CollisionChecker cChecker = new CollisionChecker(this);
@@ -56,6 +56,13 @@ public class GamePanel extends JPanel implements Runnable {
 	// -------------------------------------------------------------------------
 	public Player player = new Player(this, keyH); // The player entity, initialized with a reference to this panel and the key handler.
 	public SuperObject[] objs = new SuperObject[10]; // Prepares up to 10 object slots to be DISPLAYED during the game
+
+	// -------------------------------------------------------------------------
+	// Game State
+	// -------------------------------------------------------------------------
+	public int gameState = 0;
+	public final int playState = 1; // Why not enums or true and false?
+	public final int pauseState = 2;
 
 	/**
 	 * Constructs and configures the {@code GamePanel}.
@@ -79,7 +86,8 @@ public class GamePanel extends JPanel implements Runnable {
 
 	public void setupGame() {
 		assetSetter.setObject();
-		playMusic(); // Index = 0 is theme music
+		playMusic();
+		gameState = playState;
 	}
 
 	// -------------------------------------------------------------------------
@@ -152,7 +160,12 @@ public class GamePanel extends JPanel implements Runnable {
 	 * </p>
 	 */
 	public void update() {
-		player.update();
+		if ( gameState == playState ) {
+			player.update();
+		}
+		if ( gameState == pauseState ) {
+			// TODO nothing for now
+		}
 	}
 
 	/**

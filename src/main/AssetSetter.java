@@ -27,40 +27,6 @@ public class AssetSetter {
 	 * TODO: Find a better way to load objects rather than manually setting each one, perhaps via an object map file.
 	 */
 	public void setObject() {
-		// Keys
-		gamePanel.objs[0] = new OBJ_Key(gamePanel);
-		gamePanel.objs[0].worldX = 23 * gamePanel.tileSize;
-		gamePanel.objs[0].worldY = 7 * gamePanel.tileSize;
-
-		gamePanel.objs[1] = new OBJ_Key(gamePanel);
-		gamePanel.objs[1].worldX = 23 * gamePanel.tileSize;
-		gamePanel.objs[1].worldY = 40 * gamePanel.tileSize;
-
-		gamePanel.objs[2] = new OBJ_Key(gamePanel);
-		gamePanel.objs[2].worldX = 37 * gamePanel.tileSize;
-		gamePanel.objs[2].worldY = 7 * gamePanel.tileSize;
-
-		// Doors
-		gamePanel.objs[3] = new OBJ_Door(gamePanel);
-		gamePanel.objs[3].worldX = 10 * gamePanel.tileSize;
-		gamePanel.objs[3].worldY = 11 * gamePanel.tileSize;
-
-		gamePanel.objs[4] = new OBJ_Door(gamePanel);
-		gamePanel.objs[4].worldX = 8 * gamePanel.tileSize;
-		gamePanel.objs[4].worldY = 28 * gamePanel.tileSize;
-
-		gamePanel.objs[5] = new OBJ_Door(gamePanel);
-		gamePanel.objs[5].worldX = 12 * gamePanel.tileSize;
-		gamePanel.objs[5].worldY = 22 * gamePanel.tileSize;
-
-		// Chest
-		gamePanel.objs[6] = new OBJ_Chest(gamePanel);
-		gamePanel.objs[6].worldX = 10 * gamePanel.tileSize;
-		gamePanel.objs[6].worldY = 7 * gamePanel.tileSize;
-
-		// Boots
-		gamePanel.objs[7] = new OBJ_Boots(gamePanel);
-		gamePanel.objs[7].worldX = 37 * gamePanel.tileSize;
-		gamePanel.objs[7].worldY = 42 * gamePanel.tileSize;
+		// TODO temp for now
 	}
 }
