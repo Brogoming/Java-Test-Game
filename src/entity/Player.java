@@ -2,13 +2,9 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
-import main.UtilityTool;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Objects;
 
 /**
  * Represents the player-controlled character, handling movement input,
@@ -19,33 +15,28 @@ public class Player extends Entity {
 	// -------------------------------------------------------------------------
 	// Core References
 	// -------------------------------------------------------------------------
-	GamePanel gamePanel; // Reference to the main game panel, used to access screen and tile dimensions.
-	KeyHandler keyH; // Reference to the key handler, used to read directional input each frame.
+	KeyHandler keyH; // Reference to the key handler, used to read directional input each frame
 
 	// -------------------------------------------------------------------------
 	// Screen Position
 	// -------------------------------------------------------------------------
-	public final int screenX; // The fixed X screen coordinate where the player is always drawn, horizontally centered.
-	public final int screenY; // The fixed Y screen coordinate where the player is always drawn, vertically centered.
+	public final int screenX; // Fixed X screen coordinate where the player is always drawn, horizontally centered
+	public final int screenY; // Fixed Y screen coordinate where the player is always drawn, vertically centered
 
 	// -------------------------------------------------------------------------
-	// Inventory
+	// Animation
 	// -------------------------------------------------------------------------
-
-	// -------------------------------------------------------------------------
-	// Extra animation variables
-	// -------------------------------------------------------------------------
-	int standCounter = 0;
+	int standCounter = 0; // Tracks frames elapsed while idle before snapping back to the standing sprite
 
 	/**
-	 * Constructs a Player, calculates its fixed center screen position,
+	 * Constructs a Player, calculates its fixed center screen position, configures the hitbox,
 	 * and loads default values and sprite images.
 	 *
 	 * @param gamePanel  the {@link GamePanel} this player belongs to
 	 * @param keyHandler the {@link KeyHandler} used to read keyboard input
 	 */
 	public Player( GamePanel gamePanel, KeyHandler keyHandler ) {
-		this.gamePanel = gamePanel;
+		super(gamePanel);
 		this.keyH = keyHandler;
 
 		// Center the player on screen, offsetting by half a tile since
@@ -53,139 +44,107 @@ public class Player extends Entity {
 		screenX = gamePanel.screenWidth / 2 - (gamePanel.tileSize / 2);
 		screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
 
-		// set player hit box
-		solidArea = new Rectangle(); // hitBoxX, hitBoxY, hitBoxWidth, hitBoxHeight
-		solidArea.x = gamePanel.tileSize / 6; // 1/6 from the left of entity = 8 pixels
-		solidArea.y = gamePanel.tileSize / 3; // 1/3 from the top of entity = 16 pixels
+		// Define the player's hitbox as a smaller rectangle inset from the sprite edges
+		solidArea = new Rectangle();
+		solidArea.x = gamePanel.tileSize / 6;      // 8px from the left edge of the sprite
+		solidArea.y = gamePanel.tileSize / 3;      // 16px from the top edge of the sprite
+		solidArea.width = gamePanel.tileSize * 2 / 3;  // 32px wide (2/3 of tile)
+		solidArea.height = gamePanel.tileSize * 2 / 3;  // 32px tall (2/3 of tile)
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
-		solidArea.width = gamePanel.tileSize * 2 / 3; // 2/3 of the players width = 32 pixels
-		solidArea.height = gamePanel.tileSize * 2 / 3; // 2/3 of the players height = 32 pixels
 
 		setDefaultValues();
 		getPlayerImage();
 	}
 
-	// -------------------------------------------------------------------------
-	// Initialization
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Sets the player's starting world position (tile 23, 21), movement speed, and default direction.
 	 */
 	public void setDefaultValues() {
-		// Place the player at tile (23, 21) in the game world
-		worldX = gamePanel.tileSize * 23;
-		worldY = gamePanel.tileSize * 21;
-
-		// Movement speed in pixels per frame
-		speed = 4;
-
-		// Default facing direction on game start
-		direction = "down";
+		worldX = gamePanel.tileSize * 23; // Starting tile column
+		worldY = gamePanel.tileSize * 21; // Starting tile row
+		speed = 4;                       // Movement speed in pixels per frame
+		direction = "down";                  // Default facing direction on game start
 	}
 
 	/**
 	 * Loads all directional walk-cycle sprite frames from the /player/ resource folder.
-	 * If loading fails, the stack trace is printed.
 	 * <p>
 	 * TODO: Streamline the process to make it easier to swap out the player sprite sheet.
 	 */
 	public void getPlayerImage() {
-		up1 = setup("boy_up_1");
-		up2 = setup("boy_up_2");
-		down1 = setup("boy_down_1");
-		down2 = setup("boy_down_2");
-		left1 = setup("boy_left_1");
-		left2 = setup("boy_left_2");
-		right1 = setup("boy_right_1");
-		right2 = setup("boy_right_2");
+		up1 = setup("/player/boy_up_1.png");
+		up2 = setup("/player/boy_up_2.png");
+		down1 = setup("/player/boy_down_1.png");
+		down2 = setup("/player/boy_down_2.png");
+		left1 = setup("/player/boy_left_1.png");
+		left2 = setup("/player/boy_left_2.png");
+		right1 = setup("/player/boy_right_1.png");
+		right2 = setup("/player/boy_right_2.png");
 	}
-
-	public BufferedImage setup( String imageName ) {
-		UtilityTool util = new UtilityTool();
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/" + imageName + ".png")));
-			image = util.scaleImage(image, gamePanel.tileSize, gamePanel.tileSize);
-		} catch ( IOException e ) {
-			e.printStackTrace();
-		}
-		return image;
-	}
-
-	// -------------------------------------------------------------------------
-	// Game Loop Methods
-	// -------------------------------------------------------------------------
 
 	/**
-	 * Reads keyboard input to move the player in the world and advances the walk-cycle animation.
-	 * Sprite animation only ticks while a movement key is held.
+	 * Reads keyboard input to move the player, runs collision checks, handles interactions,
+	 * and advances the walk-cycle or idle animation accordingly.
+	 * <p>
+	 * TODO: Fix input handling so character movement is smoother.
 	 */
 	public void update() {
-		// Only process movement and animation if at least one direction key is held
 		if ( keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed ) {
 
-			//TODO fix user input so character movement is smoother
+			// Update direction based on which key is held
 			if ( keyH.upPressed ) direction = "up";
 			if ( keyH.downPressed ) direction = "down";
 			if ( keyH.leftPressed ) direction = "left";
 			if ( keyH.rightPressed ) direction = "right";
-			// if you want diagonal movement don't use else if or just add it here
 
-			// CHECK COLLISIONS
+			// Run collision checks before applying movement
 			collisionOn = false;
 			gamePanel.cChecker.checkTileCollision(this);
+
 			int objIndex = gamePanel.cChecker.checkObjectCollision(this, true);
 			objectInteraction(objIndex);
 
-			//IF COLLISION IS FALSE, PLAYER CAN MOVE
+			int npcIndex = gamePanel.cChecker.checkEntityCollision(this, gamePanel.npcs);
+			interactNpc(npcIndex);
+
+			// Only move if no collision was detected
 			if ( !collisionOn ) {
 				switch ( direction ) {
 					case "up":
-						worldY -= speed; // Move player up in the world (decrease Y)
-						break;
+						worldY -= speed;
+						break; // Move up (decrease Y)
 					case "down":
-						worldY += speed; // Move player down in the world (increase Y)
-						break;
+						worldY += speed;
+						break; // Move down (increase Y)
 					case "left":
-						worldX -= speed; // Move player left in the world (decrease X)
-						break;
+						worldX -= speed;
+						break; // Move left (decrease X)
 					case "right":
-						worldX += speed; // Move player right in the world (increase X)
-						break;
+						worldX += speed;
+						break; // Move right (increase X)
 				}
 			}
 
-			/*
-			 // Diagonal movement
-			 if ( keyH.upPressed ) {
-			 direction = "up";
-			 if ( !collisionOn ) worldY -= speed;
-			 }
-			 if ( keyH.downPressed ) {
-			 direction = "down";
-			 if ( !collisionOn ) worldY += speed;
-			 }
-			 if ( keyH.leftPressed ) {
-			 direction = "left";
-			 if ( !collisionOn ) worldX -= speed;
-			 }
-			 if ( keyH.rightPressed ) {
-			 direction = "right";
-			 if ( !collisionOn ) worldX += speed;
-			 }
-			 */
+            /*
+             // Diagonal movement (uncomment and remove direction-locking above to enable)
+             if (keyH.upPressed)    { direction = "up";    if (!collisionOn) worldY -= speed; }
+             if (keyH.downPressed)  { direction = "down";  if (!collisionOn) worldY += speed; }
+             if (keyH.leftPressed)  { direction = "left";  if (!collisionOn) worldX -= speed; }
+             if (keyH.rightPressed) { direction = "right"; if (!collisionOn) worldX += speed; }
+             */
 
-			spriteCounter++; // Advance the animation frame counter each update tick
-			if ( spriteCounter > 12 ) { // Toggle between sprite frames 1 and 2 every 12 frames to create a walk cycle
+			// Advance walk-cycle, toggling sprite frames every 12 ticks
+			spriteCounter++;
+			if ( spriteCounter > 12 ) {
 				if ( spriteNum == 1 ) spriteNum = 2;
 				else if ( spriteNum == 2 ) spriteNum = 1;
-				spriteCounter = 0; // Reset counter after toggling
+				spriteCounter = 0;
 			}
 		} else {
+			// Snap back to standing sprite after ~20 frames of no input (1/3 of a second)
 			standCounter++;
-			if ( standCounter == 20 ) { // Waits a 3rd of a second before going to standing mode
+			if ( standCounter == 20 ) {
 				spriteNum = 1;
 				standCounter = 0;
 			}
@@ -193,14 +152,29 @@ public class Player extends Entity {
 	}
 
 	/**
-	 * Interacts with the object depending on what the object is
+	 * Handles interaction logic for the object the player is currently touching.
 	 *
-	 * @param index the index of the object the player is touching
+	 * @param index the index of the touched object in {@code gamePanel.objs}, or 999 if none
 	 */
 	public void objectInteraction( int index ) {
 		if ( index != 999 ) {
-			// TODO temp for now
+			// TODO: Implement object interaction logic per object type
 		}
+	}
+
+	/**
+	 * Triggers dialogue with an NPC if the player is touching one and presses the interact key.
+	 *
+	 * @param index the index of the touched NPC in {@code gamePanel.npcs}, or 999 if none
+	 */
+	public void interactNpc( int index ) {
+		if ( index != 999 ) {
+			if ( keyH.interactPressed ) {
+				gamePanel.gameState = gamePanel.dialogueState;
+				gamePanel.npcs[index].speak();
+			}
+		}
+		keyH.interactPressed = false; // Always reset interact key to prevent repeated triggers
 	}
 
 	/**
@@ -210,7 +184,6 @@ public class Player extends Entity {
 	 * @param g2 the {@link Graphics2D} context used for rendering
 	 */
 	public void draw( Graphics2D g2 ) {
-		// Holds the sprite frame to draw this tick; determined by direction and animation frame
 		BufferedImage image = null;
 
 		// Select the correct sprite frame based on current direction and walk-cycle frame
@@ -233,11 +206,9 @@ public class Player extends Entity {
 				break;
 		}
 
-		// Draw the selected sprite at the player's fixed screen position, scaled to tile size
 		g2.drawImage(image, screenX, screenY, null);
 
-		// Draw collision area for troubleshooting
-		// TODO disable before release lol
+		// TODO: Disable collision box debug drawing before release
 		g2.setColor(Color.RED);
 		g2.drawRect(screenX + solidArea.x, screenY + solidArea.y, solidArea.width, solidArea.height);
 	}

@@ -1,5 +1,6 @@
 package main;
 
+import entity.NPC_OldMan;
 import object.OBJ_Boots;
 import object.OBJ_Chest;
 import object.OBJ_Door;
@@ -26,7 +27,18 @@ public class AssetSetter {
 	 * <p>
 	 * TODO: Find a better way to load objects rather than manually setting each one, perhaps via an object map file.
 	 */
-	public void setObject() {
+	public void setObjects() {
 		// TODO temp for now
+	}
+
+	/**
+	 * Instantiates and places all npcs into {@code gamePanel.npcs} at their tile-based positions.
+	 * <p>
+	 * TODO: Find a better way to load npcs rather than manually setting each one, perhaps via an npcs map file.
+	 */
+	public void setNpcs() {
+		gamePanel.npcs[0] = new NPC_OldMan(gamePanel);
+		gamePanel.npcs[0].worldX = gamePanel.tileSize * 21;
+		gamePanel.npcs[0].worldY = gamePanel.tileSize * 21;
 	}
 }

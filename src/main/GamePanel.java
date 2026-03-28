@@ -1,5 +1,6 @@
 package main;
 
+import entity.Entity;
 import entity.Player;
 import object.SuperObject;
 import tile.TileManager;
@@ -8,85 +9,88 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * The main game panel that serves as the primary rendering surface and game loop controller.
- * <p>
- * {@code GamePanel} extends {@link JPanel} to act as the game's canvas, and implements
- * {@link Runnable} to support running the game loop on a dedicated {@link Thread}.
- * It manages screen configuration, frame timing, player input, and delegates
- * rendering and logic updates to the appropriate game entities.
- * </p>
+ * The main game panel serving as the primary rendering surface, game loop controller,
+ * and central hub for all core game systems.
  */
 public class GamePanel extends JPanel implements Runnable {
+
 	// -------------------------------------------------------------------------
 	// Screen Settings
 	// -------------------------------------------------------------------------
-	final int originalTileSize = 16; // The base tile size in pixels before scaling (16x16 pixels).
-	final int scale = 3; // The scale multiplier applied to the original tile size. Increasing this value makes all tiles larger on higher-resolution screens.
-	public final int tileSize = originalTileSize * scale; // The effective tile size after scaling (48x48 pixels).
-	public final int maxScreenCol = 16; // The number of tile columns visible on screen at one time.
-	public final int maxScreenRow = 12; // The number of tile rows visible on screen at one time.
-	public final int screenWidth = tileSize * maxScreenCol; // The total screen width in pixels, derived from tile size and column count (768 pixels).
-	public final int screenHeight = tileSize * maxScreenRow; // The total screen height in pixels, derived from tile size and row count (576 pixels).
+	final int originalTileSize = 16;                         // Base tile size in pixels before scaling (16x16)
+	final int scale = 3;                                     // Scale multiplier applied to the original tile size
+	public final int tileSize = originalTileSize * scale;    // Effective tile size after scaling (48x48 pixels)
+	public final int maxScreenCol = 16;                      // Number of tile columns visible on screen at once
+	public final int maxScreenRow = 12;                      // Number of tile rows visible on screen at once
+	public final int screenWidth = tileSize * maxScreenCol;  // Total screen width in pixels (768)
+	public final int screenHeight = tileSize * maxScreenRow; // Total screen height in pixels (576)
 
 	// -------------------------------------------------------------------------
 	// World Settings
 	// -------------------------------------------------------------------------
-	public final int maxWorldCol = 50;
-	public final int maxWorldRow = 50;
+	public final int maxWorldCol = 50; // Total number of tile columns in the game world
+	public final int maxWorldRow = 50; // Total number of tile rows in the game world
 
 	// -------------------------------------------------------------------------
 	// Game Loop Settings
 	// -------------------------------------------------------------------------
-	int FPS = 60; // The target number of frames to render and update per second.
+	int FPS = 60; // Target number of frames to render and update per second
 
 	// -------------------------------------------------------------------------
 	// Core System Components
 	// -------------------------------------------------------------------------
-	TileManager tileManager = new TileManager(this);
-	KeyHandler keyH = new KeyHandler(this); //Handles keyboard input and tracks which keys are currently pressed.
-	Sound soundEffect = new Sound(); // Specifically for object effects
-	Sound music = new Sound(); // Specifically for sound effects
-	public CollisionChecker cChecker = new CollisionChecker(this);
-	public AssetSetter assetSetter = new AssetSetter(this);
-	public UI ui = new UI(this);
-	Thread gameThread; // The thread that runs the game loop. When started, it automatically invokes the {@link #run()} method, which drives updates and rendering at the target {@link #FPS}.
+	TileManager tileManager = new TileManager(this);  // Loads and renders all world tiles
+	KeyHandler keyH = new KeyHandler(this);   // Handles keyboard input and tracks key states
+	Sound soundEffect = new Sound();            // Used for short one-shot sound effects
+	Sound music = new Sound();            // Used for looping background music
+	public CollisionChecker cChecker = new CollisionChecker(this); // Handles tile and object collision detection
+	public AssetSetter assetSetter = new AssetSetter(this);      // Places objects and NPCs into the world
+	public UI ui = new UI(this);               // Manages all on-screen UI rendering
+	Thread gameThread;                                          // The thread that runs the game loop via run()
 
 	// -------------------------------------------------------------------------
 	// Entity and Object
 	// -------------------------------------------------------------------------
-	public Player player = new Player(this, keyH); // The player entity, initialized with a reference to this panel and the key handler.
-	public SuperObject[] objs = new SuperObject[10]; // Prepares up to 10 object slots to be DISPLAYED during the game
+	public Player player = new Player(this, keyH); // The player entity controlled by keyboard input
+	public SuperObject[] objs = new SuperObject[10];    // Holds up to 10 interactable world objects
+	public Entity[] npcs = new Entity[10];         // Holds up to 10 active NPCs in the world
 
 	// -------------------------------------------------------------------------
 	// Game State
 	// -------------------------------------------------------------------------
-	public int gameState = 0;
-	public final int playState = 1; // Why not enums or true and false?
-	public final int pauseState = 2;
+	// TODO: Consider replacing int state constants with an enum for clarity and type safety
+	public int gameState;
+	public final int playState = 1; // Game is actively running
+	public final int pauseState = 2; // Game is paused
+	public final int dialogueState = 3; // Player is in a dialogue interaction
+
+	// -------------------------------------------------------------------------
+	// Constructor
+	// -------------------------------------------------------------------------
 
 	/**
-	 * Constructs and configures the {@code GamePanel}.
-	 * <p>
-	 * Sets the preferred screen dimensions, background color, double buffering,
-	 * key input listener, and focus behavior required for gameplay.
-	 * </p>
+	 * Constructs and configures the GamePanel, setting up screen size, background,
+	 * double buffering, and keyboard input handling.
 	 */
 	public GamePanel() {
-		// Set the canvas size to match the calculated screen dimensions
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
 		this.setBackground(Color.black);
-
-		// Enable double buffering: draws frames to an offscreen buffer first,
-		// then flushes to screen — reduces flickering during rendering
-		this.setDoubleBuffered(true);
-
-		this.addKeyListener(keyH); // Register the key handler to listen for keyboard events on this panel
-		this.setFocusable(true); // Allow this panel to receive focus so it can capture keyboard input
+		this.setDoubleBuffered(true); // Draw to offscreen buffer first to reduce flicker
+		this.addKeyListener(keyH);    // Register key handler to capture keyboard events
+		this.setFocusable(true);      // Allow this panel to receive keyboard focus
 	}
 
+	// -------------------------------------------------------------------------
+	// Setup
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Initializes the game world by placing objects and NPCs, then sets the game state to playing.
+	 */
 	public void setupGame() {
-		assetSetter.setObject();
-		playMusic();
+		assetSetter.setObjects();
+		assetSetter.setNpcs();
+		// playMusic(); // TODO: Uncomment when music is ready
 		gameState = playState;
 	}
 
@@ -95,51 +99,41 @@ public class GamePanel extends JPanel implements Runnable {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Creates and starts the game thread, which triggers the {@link #run()} method.
-	 * <p>
-	 * Should be called once after the window has been made visible to begin gameplay.
-	 * </p>
+	 * Creates and starts the game thread, triggering the run() game loop.
+	 * Should be called once after the window is made visible.
 	 */
 	public void startGameThread() {
-		// Pass this GamePanel as the Runnable so the thread calls our run() method
-		gameThread = new Thread(this);
+		gameThread = new Thread(this); // Pass this GamePanel as Runnable so the thread calls run()
 		gameThread.start();
 	}
 
 	/**
-	 * The core game loop, executed on the {@link #gameThread}.
-	 * <p>
-	 * Uses a delta-time accumulator pattern to decouple game updates from
-	 * actual CPU speed, ensuring the game runs at a consistent {@link #FPS}
-	 * regardless of system performance. Also prints the actual FPS to the
-	 * console once per second for debugging.
-	 * </p>
+	 * The core game loop using a delta-time accumulator to maintain a consistent
+	 * frame rate regardless of system performance.
 	 */
 	@Override
 	public void run() {
-		// 1,000,000,000 nanoseconds = 1 second
-		// Calculate how many nanoseconds should pass between each frame
-		double drawInterval = (double) 1000000000 / FPS;
-		double delta = 0; // Accumulates elapsed time; when >= 1, it's time for the next frame
+		double drawInterval = (double) 1000000000 / FPS; // Nanoseconds per frame (1s = 1,000,000,000ns)
+		double delta = 0; // Accumulates elapsed frame fractions; a frame is processed when delta >= 1
 		long lastTime = System.nanoTime();
 		long currentTime;
-		long timer = 0; // Accumulates time to track when one second has elapsed (for FPS logging)
-		int drawCount = 0; // Counts how many frames were drawn in the current second
+		long timer = 0; // Accumulates nanoseconds to detect when one full second has passed
+		int drawCount = 0; // Counts frames drawn in the current second for FPS logging
 
 		while ( gameThread != null ) {
 			currentTime = System.nanoTime();
-			delta += (currentTime - lastTime) / drawInterval; // Add the fraction of a frame interval that has elapsed since last loop
-			timer += currentTime - lastTime; // Accumulate total elapsed nanoseconds for FPS reporting
+			delta += (currentTime - lastTime) / drawInterval; // Fraction of a frame interval elapsed
+			timer += (currentTime - lastTime);
 			lastTime = currentTime;
 
-			if ( delta >= 1 ) { // Only update and render once a full frame interval has accumulated
-				update(); // Step 1: Update game state (e.g., player position, input handling)
-				repaint(); // Step 2: Repaint the panel with the updated state, repaint() schedules a call to paintComponent()
-				delta--; // Subtract 1 to account for the frame just processed
+			if ( delta >= 1 ) {
+				update();  // Step 1: Update game state (positions, input, logic)
+				repaint(); // Step 2: Schedule a paintComponent() call with the updated state
+				delta--;
 				drawCount++;
 			}
 
-			// Once one second has passed, log the FPS count and reset counters
+			// Log actual FPS to console once per second
 			if ( timer >= 1000000000 ) {
 				System.out.println("FPS: " + drawCount);
 				drawCount = 0;
@@ -153,74 +147,88 @@ public class GamePanel extends JPanel implements Runnable {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Updates the game state for the current frame.
-	 * <p>
-	 * Delegates to each game entity's own update logic. Currently, updates
-	 * only the {@link Player}, but should be extended as more entities are added.
-	 * </p>
+	 * Updates all active game entities each frame, gated by the current game state.
 	 */
 	public void update() {
 		if ( gameState == playState ) {
 			player.update();
+
+			for ( Entity npc : npcs ) {
+				if ( npc != null ) npc.update();
+			}
 		}
+
 		if ( gameState == pauseState ) {
-			// TODO nothing for now
+			// TODO: Add pause state logic (e.g. pause menu rendering)
 		}
 	}
 
 	/**
-	 * Renders all game elements onto the panel for the current frame.
-	 * <p>
-	 * Overrides {@link JPanel#paintComponent(Graphics)} to perform custom drawing.
-	 * Upgrades the provided {@link Graphics} context to {@link Graphics2D} for
-	 * access to advanced rendering features, then delegates drawing to game entities.
-	 * </p>
+	 * Renders all game layers in order each frame: tiles, objects, NPCs, player, then UI.
 	 *
 	 * @param g the {@link Graphics} context provided by the Swing painting system
 	 */
 	@Override
 	public void paintComponent( Graphics g ) {
-		super.paintComponent(g); // Call the parent implementation to clear the panel before redrawing
-		Graphics2D g2 = (Graphics2D) g; // Cast to Graphics2D for enhanced rendering control (transformations, shapes, etc.)
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g; // Cast to Graphics2D for enhanced rendering control
 
-		// Debug
+		// Debug: record draw start time if debug mode is active
 		long drawStart = 0;
-		if ( keyH.debugMode ) {
-			drawStart = System.nanoTime();
-		}
+		if ( keyH.debugMode ) drawStart = System.nanoTime();
 
-		// Game Essentials
-		tileManager.draw(g2); //Layer the tiles to the play is above the tiles
-		for ( SuperObject obj : objs ) { // Place objects from the object array
+		// Draw world layers in order (tiles first so player renders above them)
+		tileManager.draw(g2);
+
+		for ( SuperObject obj : objs ) {
 			if ( obj != null ) obj.draw(g2, this);
 		}
-		player.draw(g2); // Draw the player onto the panel
-		ui.draw(g2); // Draw this last so it's not behind other assets
 
-		// Debug
+		for ( Entity npc : npcs ) {
+			if ( npc != null ) npc.draw(g2);
+		}
+
+		player.draw(g2);
+		ui.draw(g2); // Draw UI last so it always renders on top of all world elements
+
+		// Debug: print draw time to screen and console if debug mode is active
 		if ( keyH.debugMode ) {
-			long drawEnd = System.nanoTime();
-			long drawTime = drawEnd - drawStart;
+			long drawTime = System.nanoTime() - drawStart;
 			g2.setColor(Color.white);
 			g2.drawString("Draw time: " + drawTime, 10, 400);
 			System.out.println("Draw time: " + drawTime);
 		}
 
-		g2.dispose(); // Release the Graphics2D resources to free up memory
+		g2.dispose(); // Release Graphics2D resources to free memory
 	}
 
+	// -------------------------------------------------------------------------
+	// Audio
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Loads, plays, and loops the background music track.
+	 */
 	public void playMusic() {
-		music.setFile(0); // Set the file
-		music.play(); // Play
-		music.loop(); // Loop through music
+		music.setFile(0);
+		music.play();
+		music.loop();
 	}
 
+	/**
+	 * Stops the currently playing background music.
+	 */
 	public void stopMusic() {
 		music.stop();
 	}
 
+	/**
+	 * Loads and plays a one-shot sound effect at the given index.
+	 *
+	 * @param index the index of the sound effect in the Sound URL array
+	 */
 	public void playSoundEffect( int index ) {
-		soundEffect.setFile(index); // Set the file
-		soundEffect.play(); // Play
+		soundEffect.setFile(index);
+		soundEffect.play();
 	}
 }
