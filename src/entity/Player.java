@@ -65,6 +65,10 @@ public class Player extends Entity {
 		worldY = gamePanel.tileSize * 21; // Starting tile row
 		speed = 4;                       // Movement speed in pixels per frame
 		direction = "down";                  // Default facing direction on game start
+
+		// Player Status
+		maxLife = 6; // Three hearts
+		currentLife = maxLife;
 	}
 
 	/**

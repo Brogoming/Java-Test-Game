@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
  */
 public class SuperObject {
 
-	public BufferedImage image; // The sprite image displayed for this object
+	public BufferedImage image, image1, image2; // The sprite image displayed for this object
 	public String name; // The name identifier for this object
 	public boolean collision = false; // Whether this object blocks entity movement
 	public int worldX, worldY; // The object's position in world pixels

@@ -46,8 +46,59 @@ public class KeyHandler implements KeyListener {
 	public void keyPressed( KeyEvent e ) {
 		int code = e.getKeyCode(); //returns the keyCode associated with the key in this event, based on ascii characters
 
+		// Menu State
+		if ( gamePanel.gameState == gamePanel.titleState ) {
+			if ( gamePanel.ui.titleScreenState == 0 ) {
+				if ( code == KeyEvent.VK_W ) {
+					gamePanel.ui.commandNumber--;
+					if ( gamePanel.ui.commandNumber < 0 ) { // Circle back to quit option
+						gamePanel.ui.commandNumber = 2;
+					}
+				}
+				if ( code == KeyEvent.VK_S ) {
+					gamePanel.ui.commandNumber++;
+					if ( gamePanel.ui.commandNumber > 2 ) { // Circle back to new game option
+						gamePanel.ui.commandNumber = 0;
+					}
+				}
+				if ( code == KeyEvent.VK_ENTER ) {
+					if ( gamePanel.ui.commandNumber == 0 ) { // New Game
+						gamePanel.ui.titleScreenState = 1;
+					} else if ( gamePanel.ui.commandNumber == 1 ) { // Load Game
+
+					} else if ( gamePanel.ui.commandNumber == 2 ) System.exit(0); // Quit
+				}
+			} else if ( gamePanel.ui.titleScreenState == 1 ) { // Character select menu
+				if ( code == KeyEvent.VK_W ) {
+					gamePanel.ui.commandNumber--;
+					if ( gamePanel.ui.commandNumber < 0 ) { // Circle back to quit option
+						gamePanel.ui.commandNumber = 3;
+					}
+				}
+				if ( code == KeyEvent.VK_S ) {
+					gamePanel.ui.commandNumber++;
+					if ( gamePanel.ui.commandNumber > 3 ) { // Circle back to new game option
+						gamePanel.ui.commandNumber = 0;
+					}
+				}
+				if ( code == KeyEvent.VK_ENTER ) {
+					// In each of these we can put specific player stats
+					if ( gamePanel.ui.commandNumber == 0 ) { // Fighter Class
+						gamePanel.gameState = gamePanel.playState;
+						gamePanel.playMusic();
+					} else if ( gamePanel.ui.commandNumber == 1 ) { // Wizard Class
+						gamePanel.gameState = gamePanel.playState;
+						gamePanel.playMusic();
+					} else if ( gamePanel.ui.commandNumber == 2 ) { // Ranger Class
+						gamePanel.gameState = gamePanel.playState;
+						gamePanel.playMusic();
+					} else if ( gamePanel.ui.commandNumber == 3 ) gamePanel.ui.titleScreenState = 0; // Back
+				}
+			}
+		}
+
 		// Play State
-		if ( gamePanel.gameState == gamePanel.playState ) {
+		else if ( gamePanel.gameState == gamePanel.playState ) {
 			// Movement
 			if ( code == KeyEvent.VK_W ) upPressed = true;
 			if ( code == KeyEvent.VK_S ) downPressed = true;
@@ -55,7 +106,8 @@ public class KeyHandler implements KeyListener {
 			if ( code == KeyEvent.VK_D ) rightPressed = true;
 
 			// Interaction
-			if ( code == KeyEvent.VK_E ) interactPressed = true;
+			// TODO Add a check for both the player and npc collision is on before being able to press E
+			if ( code == KeyEvent.VK_E && gamePanel.player.collisionOn ) interactPressed = true;
 
 			// Debug
 			if ( code == KeyEvent.VK_T ) debugMode = !debugMode;

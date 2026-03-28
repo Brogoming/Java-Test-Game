@@ -45,6 +45,10 @@ public class Entity {
 	int dialogueIndex = 0;                 // Tracks which dialogue line will be shown on the next speak() call
 	private BufferedImage image;           // The current sprite frame being drawn this tick
 
+	// Character Status
+	public int maxLife;
+	public int currentLife;
+
 	/**
 	 * Constructs an Entity bound to the game panel and initializes its hitbox to one full tile.
 	 *
@@ -190,8 +194,6 @@ public class Entity {
 					break;
 			}
 
-			// TODO: Duplicate drawImage call detected below — the first call (without tileSize) is likely a bug and should be removed
-			// g2.drawImage(image, screenX, screenY, null); // <- remove this line
 			g2.drawImage(image, screenX, screenY, gamePanel.tileSize, gamePanel.tileSize, null);
 		}
 	}

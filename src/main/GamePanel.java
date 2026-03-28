@@ -60,6 +60,7 @@ public class GamePanel extends JPanel implements Runnable {
 	// -------------------------------------------------------------------------
 	// TODO: Consider replacing int state constants with an enum for clarity and type safety
 	public int gameState;
+	public final int titleState = 0;
 	public final int playState = 1; // Game is actively running
 	public final int pauseState = 2; // Game is paused
 	public final int dialogueState = 3; // Player is in a dialogue interaction
@@ -90,8 +91,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public void setupGame() {
 		assetSetter.setObjects();
 		assetSetter.setNpcs();
-		// playMusic(); // TODO: Uncomment when music is ready
-		gameState = playState;
+		gameState = titleState;
 	}
 
 	// -------------------------------------------------------------------------
@@ -177,19 +177,25 @@ public class GamePanel extends JPanel implements Runnable {
 		long drawStart = 0;
 		if ( keyH.debugMode ) drawStart = System.nanoTime();
 
-		// Draw world layers in order (tiles first so player renders above them)
-		tileManager.draw(g2);
+		//TITLE SCREEN
+		if ( gameState == titleState ) {
+			ui.draw(g2);
+		} else {
+			// Draw world layers in order (tiles first so player renders above them)
+			tileManager.draw(g2);
 
-		for ( SuperObject obj : objs ) {
-			if ( obj != null ) obj.draw(g2, this);
+			for ( SuperObject obj : objs ) {
+				if ( obj != null ) obj.draw(g2, this);
+			}
+
+			for ( Entity npc : npcs ) {
+				if ( npc != null ) npc.draw(g2);
+			}
+
+			player.draw(g2);
+			ui.draw(g2); // Draw UI last so it always renders on top of all world elements
 		}
 
-		for ( Entity npc : npcs ) {
-			if ( npc != null ) npc.draw(g2);
-		}
-
-		player.draw(g2);
-		ui.draw(g2); // Draw UI last so it always renders on top of all world elements
 
 		// Debug: print draw time to screen and console if debug mode is active
 		if ( keyH.debugMode ) {
