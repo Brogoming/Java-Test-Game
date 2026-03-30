@@ -102,15 +102,22 @@ public class Player extends Entity {
 			if ( keyH.leftPressed ) direction = "left";
 			if ( keyH.rightPressed ) direction = "right";
 
-			// Run collision checks before applying movement
+			// Tile Collision
 			collisionOn = false;
 			gamePanel.cChecker.checkTileCollision(this);
 
+			// Object Collision
 			int objIndex = gamePanel.cChecker.checkObjectCollision(this, true);
 			objectInteraction(objIndex);
 
+			// NPC Collision
 			int npcIndex = gamePanel.cChecker.checkEntityCollision(this, gamePanel.npcs);
 			interactNpc(npcIndex);
+
+			// Check Events
+			gamePanel.eHandler.checkEvents();
+
+			keyH.interactPressed = false; // Always reset interact key to prevent repeated triggers
 
 			// Only move if no collision was detected
 			if ( !collisionOn ) {
@@ -178,7 +185,6 @@ public class Player extends Entity {
 				gamePanel.npcs[index].speak();
 			}
 		}
-		keyH.interactPressed = false; // Always reset interact key to prevent repeated triggers
 	}
 
 	/**
