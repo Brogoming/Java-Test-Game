@@ -111,6 +111,9 @@ public class Entity {
 		gamePanel.cChecker.checkTileCollision(this);
 		gamePanel.cChecker.checkObjectCollision(this, false);
 		gamePanel.cChecker.checkPlayerCollision(this);
+		gamePanel.cChecker.checkEntityCollision(this, gamePanel.enemies);
+		gamePanel.cChecker.checkEntityCollision(this, gamePanel.npcs);
+
 
 		// Only move if no collision was detected
 		if ( !collisionOn ) {

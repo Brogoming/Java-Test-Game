@@ -114,6 +114,10 @@ public class Player extends Entity {
 			int npcIndex = gamePanel.cChecker.checkEntityCollision(this, gamePanel.npcs);
 			interactNpc(npcIndex);
 
+			// Enemy Collision
+			int enemyIndex = gamePanel.cChecker.checkEntityCollision(this, gamePanel.enemies);
+			interactNpc(enemyIndex);
+
 			// Check Events
 			gamePanel.eHandler.checkEvents();
 

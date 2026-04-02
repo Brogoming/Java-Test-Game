@@ -1,10 +1,7 @@
 package main;
 
+import enemies.MON_GreenSlime;
 import entity.NPC_OldMan;
-import object.OBJ_Boots;
-import object.OBJ_Chest;
-import object.OBJ_Door;
-import object.OBJ_Key;
 
 /**
  * Responsible for placing all interactable objects into the game world at their designated positions.
@@ -28,13 +25,9 @@ public class AssetSetter {
 	 * TODO: Find a better way to load objects rather than manually setting each one, perhaps via an object map file.
 	 */
 	public void setObjects() {
-		gamePanel.objs[0] = new OBJ_Door(gamePanel);
-		gamePanel.objs[0].worldX = gamePanel.tileSize * 21;
-		gamePanel.objs[0].worldY = gamePanel.tileSize * 22;
-
-		gamePanel.objs[1] = new OBJ_Door(gamePanel);
-		gamePanel.objs[1].worldX = gamePanel.tileSize * 23;
-		gamePanel.objs[1].worldY = gamePanel.tileSize * 25;
+//		gamePanel.objs[0] = new OBJ_Door(gamePanel);
+//		gamePanel.objs[0].worldX = gamePanel.tileSize * 21;
+//		gamePanel.objs[0].worldY = gamePanel.tileSize * 22;
 	}
 
 	/**
@@ -44,7 +37,17 @@ public class AssetSetter {
 	 */
 	public void setNpcs() {
 		gamePanel.npcs[0] = new NPC_OldMan(gamePanel);
-		gamePanel.npcs[0].worldX = gamePanel.tileSize * 21;
-		gamePanel.npcs[0].worldY = gamePanel.tileSize * 21;
+		gamePanel.npcs[0].worldX = gamePanel.tileSize * 9;
+		gamePanel.npcs[0].worldY = gamePanel.tileSize * 10;
+	}
+
+	public void setEnemies() {
+		gamePanel.enemies[0] = new MON_GreenSlime(gamePanel);
+		gamePanel.enemies[0].worldX = gamePanel.tileSize * 11;
+		gamePanel.enemies[0].worldY = gamePanel.tileSize * 10;
+
+		gamePanel.enemies[1] = new MON_GreenSlime(gamePanel);
+		gamePanel.enemies[1].worldX = gamePanel.tileSize * 11;
+		gamePanel.enemies[1].worldY = gamePanel.tileSize * 11;
 	}
 }

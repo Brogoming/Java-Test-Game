@@ -160,7 +160,7 @@ public class CollisionChecker {
 				}
 
 				if ( entity.solidArea.intersects(targets[i].solidArea) ) {
-					entity.collisionOn = true;
+					if ( targets[i] != entity ) entity.collisionOn = true;
 					index = i; // Record which target was hit for interaction handling
 				}
 

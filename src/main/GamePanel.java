@@ -7,7 +7,6 @@ import tile.TileManager;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 /**
@@ -57,6 +56,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public Player player = new Player(this, keyH); // The player entity controlled by keyboard input
 	public Entity[] objs = new Entity[10];    // Holds up to 10 interactable world objects
 	public Entity[] npcs = new Entity[10];         // Holds up to 10 active NPCs in the world
+	public Entity[] enemies = new Entity[20];  //Holds up to 20 monsters at a time
 	ArrayList<Entity> entities = new ArrayList<Entity>();
 
 	// -------------------------------------------------------------------------
@@ -95,6 +95,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public void setupGame() {
 		assetSetter.setObjects();
 		assetSetter.setNpcs();
+		assetSetter.setEnemies();
 		gameState = titleState;
 	}
 
@@ -160,6 +161,9 @@ public class GamePanel extends JPanel implements Runnable {
 			for ( Entity npc : npcs ) {
 				if ( npc != null ) npc.update();
 			}
+			for ( Entity enemy : enemies ) {
+				if ( enemy != null ) enemy.update();
+			}
 		}
 
 		if ( gameState == pauseState ) {
@@ -190,15 +194,18 @@ public class GamePanel extends JPanel implements Runnable {
 
 			// Track entities list
 			entities.add(player);
-			for ( Entity npc : npcs ) {
+			for ( Entity npc : npcs ) { // NPCS
 				if ( npc != null ) entities.add(npc);
 			}
-			for ( Entity obj : objs ) {
+			for ( Entity obj : objs ) { // Objects
 				if ( obj != null ) entities.add(obj);
+			}
+			for ( Entity enemy : enemies ) { // Enemies
+				if ( enemy != null ) entities.add(enemy);
 			}
 
 			// Sort by their world y value
-			Collections.sort(entities, new Comparator<Entity>() {
+			entities.sort(new Comparator<Entity>() {
 				@Override
 				public int compare( Entity e1, Entity e2 ) {
 					return Integer.compare(e1.worldY, e2.worldY);
