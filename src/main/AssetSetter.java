@@ -28,7 +28,13 @@ public class AssetSetter {
 	 * TODO: Find a better way to load objects rather than manually setting each one, perhaps via an object map file.
 	 */
 	public void setObjects() {
-		// TODO temp for now
+		gamePanel.objs[0] = new OBJ_Door(gamePanel);
+		gamePanel.objs[0].worldX = gamePanel.tileSize * 21;
+		gamePanel.objs[0].worldY = gamePanel.tileSize * 22;
+
+		gamePanel.objs[1] = new OBJ_Door(gamePanel);
+		gamePanel.objs[1].worldX = gamePanel.tileSize * 23;
+		gamePanel.objs[1].worldY = gamePanel.tileSize * 25;
 	}
 
 	/**

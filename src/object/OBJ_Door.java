@@ -1,30 +1,27 @@
 package object;
 
+import entity.Entity;
 import main.GamePanel;
-
-import javax.imageio.ImageIO;
-import java.io.IOException;
-import java.util.Objects;
 
 /**
  * Represents a door object in the game world that blocks entity movement until opened.
  */
-public class OBJ_Door extends SuperObject {
-
-	GamePanel gamePanel;
+public class OBJ_Door extends Entity {
 
 	/**
 	 * Constructs a Door object, loading its sprite and enabling collision.
 	 */
 	public OBJ_Door( GamePanel gamePanel ) {
+		super(gamePanel);
 		name = "Door";
-		collision = true; // Doors block entity movement by default
+		down1 = setup("/objects/door.png");
+		collision = true;
 
-		try {
-			image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/objects/door.png")));
-			util.scaleImage(image, gamePanel.tileSize, gamePanel.tileSize);
-		} catch ( IOException e ) {
-			e.printStackTrace();
-		}
+		solidArea.x = 0;
+		solidArea.y = gamePanel.tileSize / 3;
+		solidArea.width = gamePanel.tileSize;
+		solidArea.height = gamePanel.tileSize * 2 / 3;
+		solidAreaDefaultX = solidArea.x;
+		solidAreaDefaultY = solidArea.y;
 	}
 }

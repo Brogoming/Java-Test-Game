@@ -132,7 +132,7 @@ public class EventHandler {
 		gamePanel.gameState = gameState;
 		gamePanel.ui.currentDialogue = "You fell in a pit!";
 		gamePanel.player.currentLife -= 1;
-		eventRects[col][row].eventDone = true; // One-time event — prevents repeat damage on the same tile
+//		eventRects[col][row].eventDone = true; // One-time event — prevents repeat damage on the same tile
 		canTouchEvent = false;
 	}
 

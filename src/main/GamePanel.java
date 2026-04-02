@@ -2,11 +2,13 @@ package main;
 
 import entity.Entity;
 import entity.Player;
-import object.SuperObject;
 import tile.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * The main game panel serving as the primary rendering surface, game loop controller,
@@ -53,8 +55,9 @@ public class GamePanel extends JPanel implements Runnable {
 	// Entity and Object
 	// -------------------------------------------------------------------------
 	public Player player = new Player(this, keyH); // The player entity controlled by keyboard input
-	public SuperObject[] objs = new SuperObject[10];    // Holds up to 10 interactable world objects
+	public Entity[] objs = new Entity[10];    // Holds up to 10 interactable world objects
 	public Entity[] npcs = new Entity[10];         // Holds up to 10 active NPCs in the world
+	ArrayList<Entity> entities = new ArrayList<Entity>();
 
 	// -------------------------------------------------------------------------
 	// Game State
@@ -185,15 +188,31 @@ public class GamePanel extends JPanel implements Runnable {
 			// Draw world layers in order (tiles first so player renders above them)
 			tileManager.draw(g2);
 
-			for ( SuperObject obj : objs ) {
-				if ( obj != null ) obj.draw(g2, this);
-			}
-
+			// Track entities list
+			entities.add(player);
 			for ( Entity npc : npcs ) {
-				if ( npc != null ) npc.draw(g2);
+				if ( npc != null ) entities.add(npc);
+			}
+			for ( Entity obj : objs ) {
+				if ( obj != null ) entities.add(obj);
 			}
 
-			player.draw(g2);
+			// Sort by their world y value
+			Collections.sort(entities, new Comparator<Entity>() {
+				@Override
+				public int compare( Entity e1, Entity e2 ) {
+					return Integer.compare(e1.worldY, e2.worldY);
+				}
+			});
+
+			// Draw entities
+			for ( Entity entity : entities ) {
+				entity.draw(g2);
+			}
+
+			// Reset the list
+			entities.clear();
+
 			ui.draw(g2); // Draw UI last so it always renders on top of all world elements
 		}
 

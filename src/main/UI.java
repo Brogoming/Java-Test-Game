@@ -1,7 +1,7 @@
 package main;
 
+import entity.Entity;
 import object.OBJ_Heart;
-import object.SuperObject;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -59,7 +59,7 @@ public class UI {
 		arial80B = new Font("Arial", Font.BOLD, 80); // Bold font for pause and end screens
 
 		// Load heart sprite variants from the shared heart object
-		SuperObject heart = new OBJ_Heart(gamePanel);
+		Entity heart = new OBJ_Heart(gamePanel);
 		heart_full = heart.image;
 		heart_half = heart.image1;
 		heart_blank = heart.image2;

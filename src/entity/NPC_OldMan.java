@@ -16,11 +16,21 @@ public class NPC_OldMan extends Entity {
 	public NPC_OldMan( GamePanel gamePanel ) {
 		super(gamePanel);
 
+		// Set movement
 		direction = "down";
 		speed = 1;
 
+		// Init body and dialogue
 		getNpcImage();
 		setDialogue();
+
+		// Set hit box
+		solidArea.x = gamePanel.tileSize / 6;      // 8px from the left edge of the sprite
+		solidArea.y = gamePanel.tileSize / 3;      // 16px from the top edge of the sprite
+		solidArea.width = gamePanel.tileSize * 2 / 3;  // 32px wide (2/3 of tile)
+		solidArea.height = gamePanel.tileSize * 2 / 3;  // 32px tall (2/3 of tile)
+		solidAreaDefaultX = solidArea.x;
+		solidAreaDefaultY = solidArea.y;
 	}
 
 	/**

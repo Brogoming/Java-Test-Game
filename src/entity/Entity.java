@@ -16,6 +16,7 @@ import java.util.Objects;
 public class Entity {
 
 	GamePanel gamePanel; // Reference to the main game panel for accessing world, collision, and UI systems
+	public String name; // The name identifier for this object
 
 	// World Position & Movement
 	public int worldX;   // The entity's current X position in pixels within the game world
@@ -29,7 +30,7 @@ public class Entity {
 	public BufferedImage right1, right2; // Walk-cycle frames for rightward movement
 
 	// Direction & Animation State
-	public String direction;       // Current facing direction: "up", "down", "left", or "right"
+	public String direction = "down"; // Current facing direction: "up", "down", "left", or "right"
 	public int spriteCounter = 0;  // Tracks frames elapsed since the last sprite swap
 	public int spriteNum = 1;      // Active sprite frame index (1 or 2) for the walk cycle
 
@@ -38,12 +39,13 @@ public class Entity {
 	public int solidAreaDefaultX;  // Default X offset of the solid area before any world translation
 	public int solidAreaDefaultY;  // Default Y offset of the solid area before any world translation
 	public boolean collisionOn = false; // True when the entity is currently blocked by a collision
+	public boolean collision = false; // Whether this object blocks entity movement
 
 	// Entity Interaction
-	public int actionCounter = 0;          // General-purpose counter used to pace NPC actions or behaviours
+	public BufferedImage image, image1, image2; // The sprite image displayed for this object
+	public int actionCounter = 0;          // General-purpose counter used to pace NPC actions or behaviors
 	String[] dialogues = new String[20];   // Stores the sequential dialogue lines for this entity
 	int dialogueIndex = 0;                 // Tracks which dialogue line will be shown on the next speak() call
-	private BufferedImage image;           // The current sprite frame being drawn this tick
 
 	// Character Status
 	public int maxLife;
@@ -145,14 +147,14 @@ public class Entity {
 	 */
 	public BufferedImage setup( String imagePath ) {
 		UtilityTool util = new UtilityTool();
-		image = null;
+		BufferedImage tempImage = null;
 		try {
-			image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
-			image = util.scaleImage(image, gamePanel.tileSize, gamePanel.tileSize);
+			tempImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+			tempImage = util.scaleImage(tempImage, gamePanel.tileSize, gamePanel.tileSize);
 		} catch ( IOException e ) {
 			e.printStackTrace();
 		}
-		return image;
+		return tempImage;
 	}
 
 	/**
