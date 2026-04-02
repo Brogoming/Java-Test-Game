@@ -57,7 +57,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public Entity[] objs = new Entity[10];    // Holds up to 10 interactable world objects
 	public Entity[] npcs = new Entity[10];         // Holds up to 10 active NPCs in the world
 	public Entity[] enemies = new Entity[20];  //Holds up to 20 monsters at a time
-	ArrayList<Entity> entities = new ArrayList<Entity>();
+	ArrayList<Entity> entities = new ArrayList<>();
 
 	// -------------------------------------------------------------------------
 	// Game State
@@ -127,8 +127,8 @@ public class GamePanel extends JPanel implements Runnable {
 
 		while ( gameThread != null ) {
 			currentTime = System.nanoTime();
-			delta += (currentTime - lastTime) / drawInterval; // Fraction of a frame interval elapsed
-			timer += (currentTime - lastTime);
+			delta += ( currentTime - lastTime ) / drawInterval; // Fraction of a frame interval elapsed
+			timer += ( currentTime - lastTime );
 			lastTime = currentTime;
 
 			if ( delta >= 1 ) {

@@ -1,7 +1,5 @@
 package main;
 
-import java.awt.*;
-
 /**
  * Manages tile-based world events by detecting player collisions with event zones
  * and triggering the appropriate game effects (damage, healing, teleportation, etc.).

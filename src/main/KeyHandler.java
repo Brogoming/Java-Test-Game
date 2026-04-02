@@ -107,7 +107,7 @@ public class KeyHandler implements KeyListener {
 
 			// Interaction
 			// TODO Add a check for both the player and npc collision is on before being able to press E
-			if ( code == KeyEvent.VK_E && gamePanel.player.collisionOn ) interactPressed = true;
+			if ( code == KeyEvent.VK_E ) interactPressed = true;
 
 			// Debug
 			if ( code == KeyEvent.VK_T ) debugMode = !debugMode;

@@ -10,13 +10,14 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Base class storing shared properties and common behaviour for all in-game entities
+ * Base class storing shared properties and common behavior for all in-game entities
  * such as the player, monsters, and NPCs.
  */
 public class Entity {
 
 	GamePanel gamePanel; // Reference to the main game panel for accessing world, collision, and UI systems
 	public String name; // The name identifier for this object
+	public EntityType type; // Player, Npc, Monster
 
 	// World Position & Movement
 	public int worldX;   // The entity's current X position in pixels within the game world
@@ -44,12 +45,14 @@ public class Entity {
 	// Entity Interaction
 	public BufferedImage image, image1, image2; // The sprite image displayed for this object
 	public int actionCounter = 0;          // General-purpose counter used to pace NPC actions or behaviors
-	String[] dialogues = new String[20];   // Stores the sequential dialogue lines for this entity
+	public String[] dialogues = new String[20];   // Stores the sequential dialogue lines for this entity
 	int dialogueIndex = 0;                 // Tracks which dialogue line will be shown on the next speak() call
 
 	// Character Status
 	public int maxLife;
 	public int currentLife;
+	public boolean invincible = false;
+	public int invincibleCounter = 0;
 
 	/**
 	 * Constructs an Entity bound to the game panel and initializes its hitbox to one full tile.
@@ -62,7 +65,7 @@ public class Entity {
 	}
 
 	/**
-	 * Defines the entity's per-frame behaviour; intended to be overridden by subclasses such as NPCs.
+	 * Defines the entity's per-frame behavior; intended to be overridden by subclasses such as NPCs.
 	 */
 	public void setAction() {}
 
@@ -73,8 +76,7 @@ public class Entity {
 	public void speak() {
 		if ( dialogues.length > 0 ) {
 			// Reset to the first dialogue line if we've reached a null entry (end of defined dialogues)
-			if ( dialogues[dialogueIndex] == null )
-				dialogueIndex = 0;
+			if ( dialogues[dialogueIndex] == null ) dialogueIndex = 0;
 
 			gamePanel.ui.currentDialogue = dialogues[dialogueIndex];
 			dialogueIndex++;
@@ -110,10 +112,16 @@ public class Entity {
 		collisionOn = false;
 		gamePanel.cChecker.checkTileCollision(this);
 		gamePanel.cChecker.checkObjectCollision(this, false);
-		gamePanel.cChecker.checkPlayerCollision(this);
 		gamePanel.cChecker.checkEntityCollision(this, gamePanel.enemies);
 		gamePanel.cChecker.checkEntityCollision(this, gamePanel.npcs);
+		boolean contactPlayer = gamePanel.cChecker.checkPlayerCollision(this);
 
+		if ( contactPlayer && this.type == EntityType.Enemy ) {
+			if ( !gamePanel.player.invincible ) {
+				gamePanel.player.currentLife -= 1;
+				gamePanel.player.invincible = true;
+			}
+		}
 
 		// Only move if no collision was detected
 		if ( !collisionOn ) {
@@ -174,10 +182,7 @@ public class Entity {
 		int screenY = worldY - gamePanel.player.worldY + gamePanel.player.screenY;
 
 		// Only draw if within the visible screen boundary, plus a 1-tile buffer for smooth scrolling
-		if ( worldX + gamePanel.tileSize > gamePanel.player.worldX - gamePanel.player.screenX &&
-				worldX - gamePanel.tileSize < gamePanel.player.worldX + gamePanel.player.screenX &&
-				worldY + gamePanel.tileSize > gamePanel.player.worldY - gamePanel.player.screenY &&
-				worldY - gamePanel.tileSize < gamePanel.player.worldY + gamePanel.player.screenY ) {
+		if ( worldX + gamePanel.tileSize > gamePanel.player.worldX - gamePanel.player.screenX && worldX - gamePanel.tileSize < gamePanel.player.worldX + gamePanel.player.screenX && worldY + gamePanel.tileSize > gamePanel.player.worldY - gamePanel.player.screenY && worldY - gamePanel.tileSize < gamePanel.player.worldY + gamePanel.player.screenY ) {
 
 			// Select the correct sprite frame based on current direction and walk-cycle frame
 			switch ( direction ) {

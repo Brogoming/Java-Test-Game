@@ -1,5 +1,7 @@
-package entity;
+package entity.npcs;
 
+import entity.Entity;
+import entity.EntityType;
 import main.GamePanel;
 
 import java.util.Random;
@@ -19,6 +21,7 @@ public class NPC_OldMan extends Entity {
 		// Set movement
 		direction = "down";
 		speed = 1;
+		type = EntityType.NPC;
 
 		// Init body and dialogue
 		getNpcImage();

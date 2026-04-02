@@ -1,6 +1,7 @@
-package enemies;
+package entity.enemies;
 
 import entity.Entity;
+import entity.EntityType;
 import main.GamePanel;
 
 import java.util.Random;
@@ -14,6 +15,7 @@ public class MON_GreenSlime extends Entity {
 	public MON_GreenSlime( GamePanel gamePanel ) {
 		super(gamePanel);
 
+		type = EntityType.Enemy;
 		name = "Green Slime";
 		speed = 1;
 		maxLife = 4;

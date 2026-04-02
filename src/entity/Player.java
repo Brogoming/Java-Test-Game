@@ -41,8 +41,8 @@ public class Player extends Entity {
 
 		// Center the player on screen, offsetting by half a tile since
 		// draw coordinates refer to the top-left corner of the sprite
-		screenX = gamePanel.screenWidth / 2 - (gamePanel.tileSize / 2);
-		screenY = gamePanel.screenHeight / 2 - (gamePanel.tileSize / 2);
+		screenX = gamePanel.screenWidth / 2 - ( gamePanel.tileSize / 2 );
+		screenY = gamePanel.screenHeight / 2 - ( gamePanel.tileSize / 2 );
 
 		// Define the player's hitbox as a smaller rectangle inset from the sprite edges
 		solidArea = new Rectangle();
@@ -53,6 +53,7 @@ public class Player extends Entity {
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
 
+		type = EntityType.Player;
 		setDefaultValues();
 		getPlayerImage();
 	}
@@ -76,7 +77,7 @@ public class Player extends Entity {
 	 * <p>
 	 * TODO: Streamline the process to make it easier to swap out the player sprite sheet.
 	 */
-	public void getPlayerImage() {
+	private void getPlayerImage() {
 		up1 = setup("/player/boy_up_1.png");
 		up2 = setup("/player/boy_up_2.png");
 		down1 = setup("/player/boy_down_1.png");
@@ -116,7 +117,7 @@ public class Player extends Entity {
 
 			// Enemy Collision
 			int enemyIndex = gamePanel.cChecker.checkEntityCollision(this, gamePanel.enemies);
-			interactNpc(enemyIndex);
+			touchEnemy(enemyIndex);
 
 			// Check Events
 			gamePanel.eHandler.checkEvents();
@@ -164,6 +165,15 @@ public class Player extends Entity {
 				standCounter = 0;
 			}
 		}
+
+		// Needs to be outside of key if statement
+		if ( invincible ) {
+			invincibleCounter++;
+			if ( invincibleCounter > 60 ) {
+				invincible = false;
+				invincibleCounter = 0;
+			}
+		}
 	}
 
 	/**
@@ -171,7 +181,7 @@ public class Player extends Entity {
 	 *
 	 * @param index the index of the touched object in {@code gamePanel.objs}, or 999 if none
 	 */
-	public void objectInteraction( int index ) {
+	private void objectInteraction( int index ) {
 		if ( index != 999 ) {
 			// TODO: Implement object interaction logic per object type
 		}
@@ -182,11 +192,20 @@ public class Player extends Entity {
 	 *
 	 * @param index the index of the touched NPC in {@code gamePanel.npcs}, or 999 if none
 	 */
-	public void interactNpc( int index ) {
+	private void interactNpc( int index ) {
 		if ( index != 999 ) {
 			if ( keyH.interactPressed ) {
 				gamePanel.gameState = gamePanel.dialogueState;
 				gamePanel.npcs[index].speak();
+			}
+		}
+	}
+
+	private void touchEnemy( int index ) {
+		if ( index != 999 ) {
+			if ( !invincible ) {
+				currentLife -= 1;
+				invincible = true;
 			}
 		}
 	}
@@ -197,7 +216,8 @@ public class Player extends Entity {
 	 *
 	 * @param g2 the {@link Graphics2D} context used for rendering
 	 */
-	public void draw( Graphics2D g2 ) {
+	public void draw( Graphics g2 ) {
+		Graphics2D g2d = (Graphics2D) g2;
 		BufferedImage image = null;
 
 		// Select the correct sprite frame based on current direction and walk-cycle frame
@@ -220,10 +240,15 @@ public class Player extends Entity {
 				break;
 		}
 
-		g2.drawImage(image, screenX, screenY, null);
+		if ( invincible ) g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f)); //make invisible
+
+		g2d.drawImage(image, screenX, screenY, null);
+
+		// reset alpha
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
 		// TODO: Disable collision box debug drawing before release
-		g2.setColor(Color.RED);
-		g2.drawRect(screenX + solidArea.x, screenY + solidArea.y, solidArea.width, solidArea.height);
+		g2d.setColor(Color.RED);
+		g2d.drawRect(screenX + solidArea.x, screenY + solidArea.y, solidArea.width, solidArea.height);
 	}
 }
