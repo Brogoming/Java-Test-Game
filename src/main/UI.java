@@ -88,6 +88,87 @@ public class UI {
 			drawPlayerLife();
 			drawDialogueScreen();
 		}
+
+		if ( gamePanel.gameState == GameState.CharStats ) {
+			drawPlayerLife();
+			drawCharacterStats();
+		}
+	}
+
+	/**
+	 * Draws the Players current stats
+	 * TODO seems a bit repetitive
+	 */
+	private void drawCharacterStats() {
+		// Calculate frame dimensions relative to the screen
+		final int frameX = (int) (gamePanel.tileSize * 9.5);
+		final int frameY = gamePanel.tileSize / 2;
+		final int width = gamePanel.tileSize * 6;
+		final int height = gamePanel.tileSize * 11;
+
+		drawSubWindow(frameX, frameY, width, height);
+
+		// Text
+		g2.setColor(Color.white);
+		g2.setFont(g2.getFont().deriveFont(32F));
+
+		int textX = frameX + 20;
+		int textY = frameY + gamePanel.tileSize;
+		final int lineHeight = 40; // Same as font size
+
+		// Labels
+		g2.drawString("Level", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Health", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Strength", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Dexterity", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Attack", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Defence", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Exp", textX, textY);
+		textY += lineHeight;
+		g2.drawString("Coins", textX, textY);
+		textY += lineHeight + 20;
+		g2.drawString("Weapon", textX, textY);
+		textY += lineHeight + 15;
+		g2.drawString("Shield", textX, textY);
+
+		// Values
+		textY = frameY + gamePanel.tileSize; // reset Y
+		int tailX = frameX + width - 30;
+
+		textX = getTailX(String.valueOf(gamePanel.player.level), tailX);
+		g2.drawString(String.valueOf(gamePanel.player.level), textX, textY);
+		textY += lineHeight;
+		textX = getTailX(gamePanel.player.currentLife + "/" + gamePanel.player.maxLife, tailX);
+		g2.drawString(gamePanel.player.currentLife + "/" + gamePanel.player.maxLife, textX, textY);
+		textY += lineHeight;
+		textX = getTailX(String.valueOf(gamePanel.player.strength), tailX);
+		g2.drawString(String.valueOf(gamePanel.player.strength), textX, textY);
+		textY += lineHeight;
+		textX = getTailX(String.valueOf(gamePanel.player.dexterity), tailX);
+		g2.drawString(String.valueOf(gamePanel.player.dexterity), textX, textY);
+		textY += lineHeight;
+		textX = getTailX(String.valueOf(gamePanel.player.attack), tailX);
+		g2.drawString(String.valueOf(gamePanel.player.attack), textX, textY);
+		textY += lineHeight;
+		textX = getTailX(String.valueOf(gamePanel.player.defence), tailX);
+		g2.drawString(String.valueOf(gamePanel.player.defence), textX, textY);
+		textY += lineHeight;
+		textX = getTailX(String.valueOf(gamePanel.player.exp), tailX);
+		g2.drawString(String.valueOf(gamePanel.player.exp), textX, textY);
+		textY += lineHeight;
+		textX = getTailX(String.valueOf(gamePanel.player.coins), tailX);
+		g2.drawString(String.valueOf(gamePanel.player.coins), textX, textY);
+		textY += lineHeight;
+
+		g2.drawImage(gamePanel.player.currentWeapon.down1, tailX - gamePanel.tileSize, textY - 12, null);
+		textY += gamePanel.tileSize;
+		g2.drawImage(gamePanel.player.currentShield.down1, tailX - gamePanel.tileSize, textY - 12, null);
 	}
 
 	/**
@@ -269,6 +350,11 @@ public class UI {
 	private int getCenterX( String text ) {
 		int length = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth();
 		return gamePanel.screenWidth / 2 - length / 2;
+	}
+
+	private int getTailX( String text, int tailX ) {
+		int length = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		return tailX - length;
 	}
 
 	/**

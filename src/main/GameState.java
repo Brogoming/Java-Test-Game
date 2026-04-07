@@ -1,5 +1,5 @@
 package main;
 
 public enum GameState {
-	Play, Pause, Title, Dialogue, GameOver
+	Play, Pause, Title, Dialogue, GameOver, CharStats
 }

@@ -46,93 +46,129 @@ public class KeyHandler implements KeyListener {
 	public void keyPressed( KeyEvent e ) {
 		int code = e.getKeyCode(); //returns the keyCode associated with the key in this event, based on ascii characters
 
-		// Menu State
-		if ( gamePanel.gameState == GameState.Title ) {
-			if ( gamePanel.ui.titleScreenState == 0 ) {
-				if ( code == KeyEvent.VK_W ) {
-					gamePanel.ui.commandNumber--;
-					if ( gamePanel.ui.commandNumber < 0 ) { // Circle back to quit option
-						gamePanel.ui.commandNumber = 2;
-					}
-				}
-				if ( code == KeyEvent.VK_S ) {
-					gamePanel.ui.commandNumber++;
-					if ( gamePanel.ui.commandNumber > 2 ) { // Circle back to new game option
-						gamePanel.ui.commandNumber = 0;
-					}
-				}
-				if ( code == KeyEvent.VK_ENTER ) {
-					if ( gamePanel.ui.commandNumber == 0 ) { // New Game
-						gamePanel.ui.titleScreenState = 1;
-					} else if ( gamePanel.ui.commandNumber == 1 ) { // Load Game
+		// Title State
+		if ( gamePanel.gameState == GameState.Title ) titleState(code);
+			// Play State
+		else if ( gamePanel.gameState == GameState.Play ) playState(code);
+			// Paused State
+		else if ( gamePanel.gameState == GameState.Pause ) pauseState(code);
+			// Dialogue State
+		else if ( gamePanel.gameState == GameState.Dialogue ) dialogState(code);
+			// Character State
+		else if ( gamePanel.gameState == GameState.CharStats ) charState(code);
+	}
 
-					} else if ( gamePanel.ui.commandNumber == 2 ) System.exit(0); // Quit
-				}
-			} else if ( gamePanel.ui.titleScreenState == 1 ) { // Character select menu
-				if ( code == KeyEvent.VK_W ) {
-					gamePanel.ui.commandNumber--;
-					if ( gamePanel.ui.commandNumber < 0 ) { // Circle back to quit option
-						gamePanel.ui.commandNumber = 3;
-					}
-				}
-				if ( code == KeyEvent.VK_S ) {
-					gamePanel.ui.commandNumber++;
-					if ( gamePanel.ui.commandNumber > 3 ) { // Circle back to new game option
-						gamePanel.ui.commandNumber = 0;
-					}
-				}
-				if ( code == KeyEvent.VK_ENTER ) {
-					// In each of these we can put specific player stats
-					if ( gamePanel.ui.commandNumber == 0 ) { // Fighter Class
-						gamePanel.gameState = GameState.Play;
-//						gamePanel.playMusic();
-					} else if ( gamePanel.ui.commandNumber == 1 ) { // Wizard Class
-						gamePanel.gameState = GameState.Play;
-//						gamePanel.playMusic();
-					} else if ( gamePanel.ui.commandNumber == 2 ) { // Ranger Class
-						gamePanel.gameState = GameState.Play;
-//						gamePanel.playMusic();
-					} else if ( gamePanel.ui.commandNumber == 3 ) gamePanel.ui.titleScreenState = 0; // Back
+	/**
+	 * Handles user actions on the title screen
+	 *
+	 * @param code the current keyboard button that was pressed
+	 */
+	private void titleState( int code ) {
+		if ( gamePanel.ui.titleScreenState == 0 ) {
+			if ( code == KeyEvent.VK_W ) {
+				gamePanel.ui.commandNumber--;
+				if ( gamePanel.ui.commandNumber < 0 ) { // Circle back to quit option
+					gamePanel.ui.commandNumber = 2;
 				}
 			}
-		}
+			if ( code == KeyEvent.VK_S ) {
+				gamePanel.ui.commandNumber++;
+				if ( gamePanel.ui.commandNumber > 2 ) { // Circle back to new game option
+					gamePanel.ui.commandNumber = 0;
+				}
+			}
+			if ( code == KeyEvent.VK_ENTER ) {
+				if ( gamePanel.ui.commandNumber == 0 ) { // New Game
+					gamePanel.ui.titleScreenState = 1;
+				} else if ( gamePanel.ui.commandNumber == 1 ) { // Load Game
 
-		// Play State
-		else if ( gamePanel.gameState == GameState.Play ) {
-			// Movement
-			if ( code == KeyEvent.VK_W ) upPressed = true;
-			if ( code == KeyEvent.VK_S ) downPressed = true;
-			if ( code == KeyEvent.VK_A ) leftPressed = true;
-			if ( code == KeyEvent.VK_D ) rightPressed = true;
-
-			// Interaction
-			// TODO Add a check for both the player and npc collision is on before being able to press E
-			if ( code == KeyEvent.VK_E ) interactPressed = true;
-
-			// Debug
-			if ( code == KeyEvent.VK_T ) debugMode = !debugMode;
-
-			// Pause
-			if ( code == KeyEvent.VK_ESCAPE ) {
-				gamePanel.gameState = GameState.Pause;
-				gamePanel.stopMusic();
+				} else if ( gamePanel.ui.commandNumber == 2 ) System.exit(0); // Quit
+			}
+		} else if ( gamePanel.ui.titleScreenState == 1 ) { // Character select menu
+			if ( code == KeyEvent.VK_W ) {
+				gamePanel.ui.commandNumber--;
+				if ( gamePanel.ui.commandNumber < 0 ) { // Circle back to quit option
+					gamePanel.ui.commandNumber = 3;
+				}
+			}
+			if ( code == KeyEvent.VK_S ) {
+				gamePanel.ui.commandNumber++;
+				if ( gamePanel.ui.commandNumber > 3 ) { // Circle back to new game option
+					gamePanel.ui.commandNumber = 0;
+				}
+			}
+			if ( code == KeyEvent.VK_ENTER ) {
+				// In each of these we can put specific player stats
+				if ( gamePanel.ui.commandNumber == 0 ) { // Fighter Class
+					gamePanel.gameState = GameState.Play;
+//						gamePanel.playMusic();
+				} else if ( gamePanel.ui.commandNumber == 1 ) { // Wizard Class
+					gamePanel.gameState = GameState.Play;
+//						gamePanel.playMusic();
+				} else if ( gamePanel.ui.commandNumber == 2 ) { // Ranger Class
+					gamePanel.gameState = GameState.Play;
+//						gamePanel.playMusic();
+				} else if ( gamePanel.ui.commandNumber == 3 ) gamePanel.ui.titleScreenState = 0; // Back
 			}
 		}
+	}
 
-		// Paused State
-		else if ( gamePanel.gameState == GameState.Pause ) {
-			if ( code == KeyEvent.VK_ESCAPE ) {
-				gamePanel.gameState = GameState.Play;
+	/**
+	 * Handles user actions when playing the game
+	 *
+	 * @param code the current keyboard button that was pressed
+	 */
+	private void playState( int code ) {
+		// Movement
+		if ( code == KeyEvent.VK_W ) upPressed = true;
+		if ( code == KeyEvent.VK_S ) downPressed = true;
+		if ( code == KeyEvent.VK_A ) leftPressed = true;
+		if ( code == KeyEvent.VK_D ) rightPressed = true;
+
+		// Character stats
+		if ( code == KeyEvent.VK_C ) gamePanel.gameState = GameState.CharStats;
+
+		// Interaction
+		if ( code == KeyEvent.VK_E ) interactPressed = true;
+
+		// Debug
+		if ( code == KeyEvent.VK_T ) debugMode = !debugMode;
+
+		// Pause
+		if ( code == KeyEvent.VK_ESCAPE ) {
+			gamePanel.gameState = GameState.Pause;
+			gamePanel.stopMusic();
+		}
+	}
+
+	/**
+	 * Handles the user actions when the game is paused
+	 *
+	 * @param code the current keyboard button that was pressed
+	 */
+	private void pauseState( int code ) {
+		if ( code == KeyEvent.VK_ESCAPE ) {
+			gamePanel.gameState = GameState.Play;
 //				gamePanel.playMusic();
-			}
 		}
+	}
 
-		//Dialogue State
-		else if ( gamePanel.gameState == GameState.Dialogue ) {
-			if ( code == KeyEvent.VK_E ) {
-				gamePanel.gameState = GameState.Play;
-			}
-		}
+	/**
+	 * Handles the user actions when in dialogue
+	 *
+	 * @param code the current keyboard button that was pressed
+	 */
+	private void dialogState( int code ) {
+		if ( code == KeyEvent.VK_E ) gamePanel.gameState = GameState.Play;
+	}
+
+	/**
+	 * Handles the user actions when the player is checking their stats
+	 *
+	 * @param code the current keyboard button that was pressed
+	 */
+	private void charState( int code ) {
+		if ( code == KeyEvent.VK_C ) gamePanel.gameState = GameState.Play;
 	}
 
 	/**

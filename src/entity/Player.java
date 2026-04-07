@@ -1,5 +1,7 @@
 package entity;
 
+import entity.objects.OBJ_Normal_Sword;
+import entity.objects.OBJ_Wood_Shield;
 import main.GamePanel;
 import main.GameState;
 import main.KeyHandler;
@@ -28,6 +30,7 @@ public class Player extends Entity {
 	// Animation
 	// -------------------------------------------------------------------------
 	int standCounter = 0; // Tracks frames elapsed while idle before snapping back to the standing sprite
+	public boolean attackCancel = false;
 
 	/**
 	 * Constructs a Player, calculates its fixed center screen position, configures the hitbox,
@@ -73,8 +76,37 @@ public class Player extends Entity {
 		speed = 4;                       // Movement speed in pixels per frame
 		direction = "down";                  // Default facing direction on game start
 
+		// Player Stats
 		maxLife = 6; // Three hearts (2 life units per heart)
 		currentLife = maxLife;
+		level = 1;
+		strength = 1; // More strength they have, the more damage they deal
+		dexterity = 1; // More dex they have, the less damage they take
+		exp = 0;
+		nextLevelExp = 5;
+		coins = 0;
+		currentWeapon = new OBJ_Normal_Sword(gamePanel);
+		currentShield = new OBJ_Wood_Shield(gamePanel);
+		attack = getAttack(); // Total attack value
+		defence = getDefence(); // Total defense value
+	}
+
+	/**
+	 * Gets the total amount of damage a player can do
+	 *
+	 * @return Total amount of damage a player can deal
+	 */
+	private int getAttack() {
+		return strength * currentWeapon.attackDamage;
+	}
+
+	/**
+	 * Gets the total amount of defense the player can block against
+	 *
+	 * @return Total amount of damage the player can block
+	 */
+	private int getDefence() {
+		return dexterity * currentShield.defenceValue;
 	}
 
 	/**
@@ -184,11 +216,9 @@ public class Player extends Entity {
 	private void interactNpc( int index ) {
 		if ( keyH.interactPressed ) {
 			if ( index != 999 ) {
+				attackCancel = true;
 				gamePanel.gameState = GameState.Dialogue;
 				gamePanel.npcs[index].speak();
-			} else {
-				gamePanel.playSoundEffect(7); // Sound effect index 7 = sword swing
-				attacking = true;
 			}
 		}
 	}
@@ -278,6 +308,13 @@ public class Player extends Entity {
 				}
 			}
 
+			if ( keyH.interactPressed && !attackCancel ) {
+				gamePanel.playSoundEffect(7);
+				attacking = true;
+				spriteCounter = 0;
+			}
+
+			attackCancel = false;
 			keyH.interactPressed = false; // Always reset interact key to prevent repeated triggers
 
 			/*

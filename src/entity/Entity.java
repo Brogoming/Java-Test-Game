@@ -15,67 +15,90 @@ import java.util.Objects;
  */
 public class Entity {
 
+	// -------------------------------------------------------------------------
+	// Core References
+	// -------------------------------------------------------------------------
 	GamePanel gamePanel; // Reference to the main game panel for accessing world, collision, and UI systems
-	public String name;      // The name identifier for this entity
-	public EntityType type;  // Classification of this entity: Player, Npc, or Monster
+	public String name; // The name identifier for this entity
+	public EntityType type; // Classification of this entity: Player, Npc, or Monster
 
 	// -------------------------------------------------------------------------
 	// World Position & Movement
 	// -------------------------------------------------------------------------
-	public int worldX;  // The entity's current X position in pixels within the game world
-	public int worldY;  // The entity's current Y position in pixels within the game world
-	public int speed;   // The number of pixels the entity moves per frame
+	public int worldX; // The entity's current X position in pixels within the game world
+	public int worldY; // The entity's current Y position in pixels within the game world
+	public int speed;  // The number of pixels the entity moves per frame
 
 	// -------------------------------------------------------------------------
 	// Sprite Images
 	// -------------------------------------------------------------------------
-	public BufferedImage up1, up2;       // Walk-cycle frames for upward movement
-	public BufferedImage down1, down2;   // Walk-cycle frames for downward movement
-	public BufferedImage left1, left2;   // Walk-cycle frames for leftward movement
+	public BufferedImage up1, up2; // Walk-cycle frames for upward movement
+	public BufferedImage down1, down2; // Walk-cycle frames for downward movement
+	public BufferedImage left1, left2; // Walk-cycle frames for leftward movement
 	public BufferedImage right1, right2; // Walk-cycle frames for rightward movement
-	public BufferedImage attackUp1, attackUp2;       // Attack-cycle frames for upward attacks
-	public BufferedImage attackDown1, attackDown2;   // Attack-cycle frames for downward attacks
-	public BufferedImage attackLeft1, attackLeft2;   // Attack-cycle frames for leftward attacks
+	public BufferedImage attackUp1, attackUp2; // Attack-cycle frames for upward attacks
+	public BufferedImage attackDown1, attackDown2; // Attack-cycle frames for downward attacks
+	public BufferedImage attackLeft1, attackLeft2; // Attack-cycle frames for leftward attacks
 	public BufferedImage attackRight1, attackRight2; // Attack-cycle frames for rightward attacks
+	public BufferedImage image, image1, image2; // General-purpose sprite slots used by objects and HUD elements
 
 	// -------------------------------------------------------------------------
 	// Direction & Animation State
 	// -------------------------------------------------------------------------
 	public String direction = "down"; // Current facing direction: "up", "down", "left", or "right"
-	public int spriteCounter = 0;      // Tracks frames elapsed since the last sprite swap
-	public int spriteNum = 1;      // Active sprite frame index (1 or 2) for the walk cycle
+	public int spriteCounter = 0; // Tracks frames elapsed since the last sprite swap
+	public int spriteNum = 1; // Active sprite frame index (1 or 2) for the walk cycle
+	boolean attacking = false; // True while the entity is actively performing an attack
 
 	// -------------------------------------------------------------------------
 	// Collision
 	// -------------------------------------------------------------------------
-	public Rectangle solidArea;         // The hitbox used for collision detection
-	public int solidAreaDefaultX;       // Default X offset of the solid area before any world translation
-	public int solidAreaDefaultY;       // Default Y offset of the solid area before any world translation
+	public Rectangle solidArea; // The hitbox used for collision detection
+	public int solidAreaDefaultX; // Default X offset of the solid area before any world translation
+	public int solidAreaDefaultY; // Default Y offset of the solid area before any world translation
 	public boolean collisionOn = false; // True when the entity is currently blocked by a collision this frame
 	public boolean collision = false; // Whether this entity blocks the movement of other entities
 	public Rectangle attackArea = new Rectangle(0, 0, 0, 0); // Hitbox activated during an attack swing
 
 	// -------------------------------------------------------------------------
-	// Entity Interaction
+	// Dialogue & NPC Behavior
 	// -------------------------------------------------------------------------
-	public BufferedImage image, image1, image2; // General-purpose sprite slots used by objects and HUD elements
-	public int actionCounter = 0;               // General-purpose counter used to pace NPC actions or behaviors
 	public String[] dialogues = new String[20]; // Stores the sequential dialogue lines for this entity
-	int dialogueIndex = 0;                      // Tracks which dialogue line will be shown on the next speak() call
+	int dialogueIndex = 0; // Tracks which dialogue line will be shown on the next speak() call
+	public int actionCounter = 0; // General-purpose counter used to pace NPC actions or behaviors
 
 	// -------------------------------------------------------------------------
 	// Character Status
 	// -------------------------------------------------------------------------
-	public int maxLife;              // The entity's maximum life total
-	public int currentLife;          // The entity's current remaining life
+	public int maxLife; // The entity's maximum life total
+	public int currentLife; // The entity's current remaining life
 	public boolean invincible = false; // True while the entity is in its post-hit invincibility window
-	public int invincibleCounter = 0;     // Tracks frames elapsed during the invincibility window
-	boolean attacking = false; // True while the entity is actively performing an attack
-	public boolean alive = true;  // False once the entity has completed its dying animation
+	public int invincibleCounter = 0; // Tracks frames elapsed during the invincibility window
+	public boolean alive = true; // False once the entity has completed its dying animation
 	public boolean dying = false; // True while the dying animation is playing
-	int dyingCounter = 0;     // Tracks frames elapsed during the dying animation
+	int dyingCounter = 0; // Tracks frames elapsed during the dying animation
+	public int level;
+	public int strength;
+	public int dexterity;
+	public int attack;
+	public int defence;
+	public int exp;
+	public int nextLevelExp;
+	public int coins;
+	public Entity currentWeapon;
+	public Entity currentShield;
+
+	// -------------------------------------------------------------------------
+	// Item Attributes
+	// -------------------------------------------------------------------------
+	public int attackDamage;
+	public int defenceValue;
+
+	// -------------------------------------------------------------------------
+	// HUD
+	// -------------------------------------------------------------------------
 	boolean hpBarOn = false; // True while the enemy HP bar should be rendered
-	int hpBarCounter = 0;     // Tracks how long the HP bar has been visible; hides after 600 frames
+	int hpBarCounter = 0; // Tracks how long the HP bar has been visible; hides after 600 frames
 
 	/**
 	 * Constructs an Entity bound to the game panel and initializes its hitbox to one full tile.

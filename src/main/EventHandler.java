@@ -128,6 +128,7 @@ public class EventHandler {
 	 */
 	public void damagePit( int col, int row, GameState gameState ) {
 		gamePanel.gameState = gameState;
+		gamePanel.playSoundEffect(6);
 		gamePanel.ui.currentDialogue = "You fell in a pit!";
 		gamePanel.player.currentLife -= 1;
 //		eventRects[col][row].eventDone = true; // One-time event — prevents repeat damage on the same tile
@@ -145,6 +146,8 @@ public class EventHandler {
 	public void healingPool( int col, int row, GameState gameState ) {
 		if ( gamePanel.keyH.interactPressed ) {
 			gamePanel.gameState = gameState;
+			gamePanel.player.attackCancel = true;
+			gamePanel.playSoundEffect(2);
 			gamePanel.ui.currentDialogue = "You drink the water.\nYour life has been recovered!";
 			gamePanel.player.currentLife += 1;
 		}
