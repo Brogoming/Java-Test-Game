@@ -74,10 +74,10 @@ public class EventHandler {
 		if ( distance > gamePanel.tileSize ) canTouchEvent = true;
 
 		if ( canTouchEvent ) {
-			if ( hit(27, 16, "right") ) damagePit(27, 16, gamePanel.dialogueState);
-			// if ( hit(27, 16, "right") ) teleport(gamePanel.dialogueState, 37, 10); // Preserved: alternate teleport trigger at same tile
+			if ( hit(27, 16, "right") ) damagePit(27, 16, GameState.Dialogue);
+			// if ( hit(27, 16, "right") ) teleport(GameState.Dialogue, 37, 10); // Preserved: alternate teleport trigger at same tile
 
-			if ( hit(23, 12, "up") ) healingPool(23, 12, gamePanel.dialogueState);
+			if ( hit(23, 12, "up") ) healingPool(23, 12, GameState.Dialogue);
 		}
 	}
 
@@ -126,7 +126,7 @@ public class EventHandler {
 	 * @param row       the row index of the damage pit tile
 	 * @param gameState the game state constant used to open the dialogue screen
 	 */
-	public void damagePit( int col, int row, int gameState ) {
+	public void damagePit( int col, int row, GameState gameState ) {
 		gamePanel.gameState = gameState;
 		gamePanel.ui.currentDialogue = "You fell in a pit!";
 		gamePanel.player.currentLife -= 1;
@@ -142,7 +142,7 @@ public class EventHandler {
 	 * @param row       the row index of the healing pool tile
 	 * @param gameState the game state constant used to open the dialogue screen
 	 */
-	public void healingPool( int col, int row, int gameState ) {
+	public void healingPool( int col, int row, GameState gameState ) {
 		if ( gamePanel.keyH.interactPressed ) {
 			gamePanel.gameState = gameState;
 			gamePanel.ui.currentDialogue = "You drink the water.\nYour life has been recovered!";
@@ -157,7 +157,7 @@ public class EventHandler {
 	 * @param newXTile  the destination column tile index
 	 * @param newYTile  the destination row tile index
 	 */
-	public void teleport( int gameState, int newXTile, int newYTile ) {
+	public void teleport( GameState gameState, int newXTile, int newYTile ) {
 		gamePanel.gameState = gameState;
 		gamePanel.ui.currentDialogue = "Teleporting...";
 		gamePanel.player.worldX = gamePanel.tileSize * newXTile; // Convert tile index to pixel world coordinate

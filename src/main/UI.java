@@ -75,16 +75,16 @@ public class UI {
 		g2.setFont(arial80B);
 		g2.setColor(Color.white);
 
-		if ( gamePanel.gameState == gamePanel.titleState ) drawTitleScreen();
+		if ( gamePanel.gameState == GameState.Title ) drawTitleScreen();
 
-		if ( gamePanel.gameState == gamePanel.playState ) drawPlayerLife();
+		if ( gamePanel.gameState == GameState.Play ) drawPlayerLife();
 
-		if ( gamePanel.gameState == gamePanel.pauseState ) {
+		if ( gamePanel.gameState == GameState.Pause ) {
 			drawPlayerLife();
 			drawPauseScreen();
 		}
 
-		if ( gamePanel.gameState == gamePanel.dialogueState ) {
+		if ( gamePanel.gameState == GameState.Dialogue ) {
 			drawPlayerLife();
 			drawDialogueScreen();
 		}
@@ -111,7 +111,8 @@ public class UI {
 		for ( int i = 0; i < gamePanel.player.currentLife; i++ ) {
 			g2.drawImage(heart_half, x, y, null); // Always draw a half heart first
 			i++;
-			if ( i < gamePanel.player.currentLife ) g2.drawImage(heart_full, x, y, null); // Upgrade to full if the second half is also filled
+			if ( i < gamePanel.player.currentLife )
+				g2.drawImage(heart_full, x, y, null); // Upgrade to full if the second half is also filled
 			x += gamePanel.tileSize + 10;
 		}
 	}
@@ -140,7 +141,7 @@ public class UI {
 			g2.drawString(title, x, y);
 
 			// Player sprite centered below the title
-			x = ( gamePanel.screenWidth / 2 ) - gamePanel.tileSize;
+			x = (gamePanel.screenWidth / 2) - gamePanel.tileSize;
 			y += gamePanel.tileSize * 2;
 			g2.drawImage(gamePanel.player.down1, x, y, gamePanel.tileSize * 2, gamePanel.tileSize * 2, null);
 
@@ -149,7 +150,7 @@ public class UI {
 
 			String menuText = "New Game";
 			x = getCenterX(menuText);
-			y += (int) ( gamePanel.tileSize * 3.5 );
+			y += (int) (gamePanel.tileSize * 3.5);
 			g2.drawString(menuText, x, y);
 			if ( commandNumber == 0 ) g2.drawString(">", x - gamePanel.tileSize, y);
 
@@ -174,7 +175,7 @@ public class UI {
 			g2.drawString(text, x, y);
 
 			// Class options — left-aligned to a fixed X rather than centered
-			x = ( gamePanel.screenWidth / 2 ) - ( gamePanel.tileSize * 2 );
+			x = (gamePanel.screenWidth / 2) - (gamePanel.tileSize * 2);
 			y += gamePanel.tileSize * 3;
 
 			text = "Fighter";

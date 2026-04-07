@@ -62,12 +62,7 @@ public class GamePanel extends JPanel implements Runnable {
 	// -------------------------------------------------------------------------
 	// Game State
 	// -------------------------------------------------------------------------
-	// TODO: Consider replacing int state constants with an enum for clarity and type safety
-	public int gameState;
-	public final int titleState = 0;
-	public final int playState = 1; // Game is actively running
-	public final int pauseState = 2; // Game is paused
-	public final int dialogueState = 3; // Player is in a dialogue interaction
+	public GameState gameState;
 
 	// -------------------------------------------------------------------------
 	// Constructor
@@ -96,7 +91,7 @@ public class GamePanel extends JPanel implements Runnable {
 		assetSetter.setObjects();
 		assetSetter.setNpcs();
 		assetSetter.setEnemies();
-		gameState = titleState;
+		gameState = GameState.Title;
 	}
 
 	// -------------------------------------------------------------------------
@@ -127,8 +122,8 @@ public class GamePanel extends JPanel implements Runnable {
 
 		while ( gameThread != null ) {
 			currentTime = System.nanoTime();
-			delta += ( currentTime - lastTime ) / drawInterval; // Fraction of a frame interval elapsed
-			timer += ( currentTime - lastTime );
+			delta += (currentTime - lastTime) / drawInterval; // Fraction of a frame interval elapsed
+			timer += (currentTime - lastTime);
 			lastTime = currentTime;
 
 			if ( delta >= 1 ) {
@@ -155,18 +150,23 @@ public class GamePanel extends JPanel implements Runnable {
 	 * Updates all active game entities each frame, gated by the current game state.
 	 */
 	public void update() {
-		if ( gameState == playState ) {
+		if ( gameState == GameState.Play ) {
 			player.update();
 
 			for ( Entity npc : npcs ) {
 				if ( npc != null ) npc.update();
 			}
-			for ( Entity enemy : enemies ) {
-				if ( enemy != null ) enemy.update();
+			for ( int i = 0; i < enemies.length; i++ ) {
+				if ( enemies[i] != null && !enemies[i].dying ) {
+					if ( enemies[i].alive )
+						enemies[i].update();
+					else
+						enemies[i] = null;
+				}
 			}
 		}
 
-		if ( gameState == pauseState ) {
+		if ( gameState == GameState.Pause ) {
 			// TODO: Add pause state logic (e.g. pause menu rendering)
 		}
 	}
@@ -186,7 +186,7 @@ public class GamePanel extends JPanel implements Runnable {
 		if ( keyH.debugMode ) drawStart = System.nanoTime();
 
 		//TITLE SCREEN
-		if ( gameState == titleState ) {
+		if ( gameState == GameState.Title ) {
 			ui.draw(g2);
 		} else {
 			// Draw world layers in order (tiles first so player renders above them)

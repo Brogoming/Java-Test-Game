@@ -47,7 +47,7 @@ public class KeyHandler implements KeyListener {
 		int code = e.getKeyCode(); //returns the keyCode associated with the key in this event, based on ascii characters
 
 		// Menu State
-		if ( gamePanel.gameState == gamePanel.titleState ) {
+		if ( gamePanel.gameState == GameState.Title ) {
 			if ( gamePanel.ui.titleScreenState == 0 ) {
 				if ( code == KeyEvent.VK_W ) {
 					gamePanel.ui.commandNumber--;
@@ -84,21 +84,21 @@ public class KeyHandler implements KeyListener {
 				if ( code == KeyEvent.VK_ENTER ) {
 					// In each of these we can put specific player stats
 					if ( gamePanel.ui.commandNumber == 0 ) { // Fighter Class
-						gamePanel.gameState = gamePanel.playState;
-						gamePanel.playMusic();
+						gamePanel.gameState = GameState.Play;
+//						gamePanel.playMusic();
 					} else if ( gamePanel.ui.commandNumber == 1 ) { // Wizard Class
-						gamePanel.gameState = gamePanel.playState;
-						gamePanel.playMusic();
+						gamePanel.gameState = GameState.Play;
+//						gamePanel.playMusic();
 					} else if ( gamePanel.ui.commandNumber == 2 ) { // Ranger Class
-						gamePanel.gameState = gamePanel.playState;
-						gamePanel.playMusic();
+						gamePanel.gameState = GameState.Play;
+//						gamePanel.playMusic();
 					} else if ( gamePanel.ui.commandNumber == 3 ) gamePanel.ui.titleScreenState = 0; // Back
 				}
 			}
 		}
 
 		// Play State
-		else if ( gamePanel.gameState == gamePanel.playState ) {
+		else if ( gamePanel.gameState == GameState.Play ) {
 			// Movement
 			if ( code == KeyEvent.VK_W ) upPressed = true;
 			if ( code == KeyEvent.VK_S ) downPressed = true;
@@ -114,23 +114,23 @@ public class KeyHandler implements KeyListener {
 
 			// Pause
 			if ( code == KeyEvent.VK_ESCAPE ) {
-				gamePanel.gameState = gamePanel.pauseState;
+				gamePanel.gameState = GameState.Pause;
 				gamePanel.stopMusic();
 			}
 		}
 
 		// Paused State
-		else if ( gamePanel.gameState == gamePanel.pauseState ) {
+		else if ( gamePanel.gameState == GameState.Pause ) {
 			if ( code == KeyEvent.VK_ESCAPE ) {
-				gamePanel.gameState = gamePanel.playState;
-				gamePanel.playMusic();
+				gamePanel.gameState = GameState.Play;
+//				gamePanel.playMusic();
 			}
 		}
 
 		//Dialogue State
-		else if ( gamePanel.gameState == gamePanel.dialogueState ) {
+		else if ( gamePanel.gameState == GameState.Dialogue ) {
 			if ( code == KeyEvent.VK_E ) {
-				gamePanel.gameState = gamePanel.playState;
+				gamePanel.gameState = GameState.Play;
 			}
 		}
 	}

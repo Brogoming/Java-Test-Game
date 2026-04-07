@@ -24,6 +24,9 @@ public class Sound {
 		soundURL[2] = getClass().getResource("/sounds/powerup.wav");          // Pick up power-up
 		soundURL[3] = getClass().getResource("/sounds/unlock.wav");           // Unlock door
 		soundURL[4] = getClass().getResource("/sounds/fanfare.wav");          // Game finished fanfare
+		soundURL[5] = getClass().getResource("/sounds/hitmonster.wav");
+		soundURL[6] = getClass().getResource("/sounds/receivedamage.wav");
+		soundURL[7] = getClass().getResource("/sounds/swingweapon.wav");
 	}
 
 	/**
